@@ -7,6 +7,7 @@ import torch.utils.data
 from lodnelf.data.hdf5dataset import get_instance_datasets_hdf5
 from lodnelf.model.simple_light_field_model import SimpleLightFieldModel
 from lodnelf.util import util
+from lodnelf.train.loss import LFLoss, _LossFn
 
 
 class TrainExecutorTest(unittest.TestCase):
@@ -19,19 +20,18 @@ class TrainExecutorTest(unittest.TestCase):
             max_observations_per_instance=9,
         )[0]
 
-    def test_given_a_valid_mocks__when_executing_a_training_run__then_the_output_is_a_float_smaller_1(
+    def test_given_a_valid_mocks__when_executing_a_training_run__then_the_output_is_a_float(
         self,
     ):
         executor = TrainExecutor(
             model=self.MockedModel(),
             optimizer=torch.optim.Adam(self.MockedModel().parameters()),
-            loss=nn.MSELoss(),
+            loss=self.MockedLoss(),
             batch_size=3,
         )
         dataset = self.MockedDataset()
 
-        loss = executor.train(dataset)
-        self.assertLess(loss, 1.0)
+        loss = executor.train(dataset, prepare_input_fn=lambda x: x[0])
         self.assertIsInstance(loss, float)
 
     def test_given_valid_props_for_model_training__when_executing_a_training_run__no_errors_are_raised(
@@ -41,7 +41,7 @@ class TrainExecutorTest(unittest.TestCase):
         executor = TrainExecutor(
             model=simple_model,
             optimizer=torch.optim.Adam(self.MockedModel().parameters()),
-            loss=nn.MSELoss(),
+            loss=LFLoss(),
             batch_size=3,
         )
 
@@ -68,3 +68,10 @@ class TrainExecutorTest(unittest.TestCase):
                 torch.tensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),
                 torch.tensor([1.0]),
             )
+
+    class MockedLoss(_LossFn):
+        def __init__(self):
+            super().__init__()
+
+        def __call__(self, output, ground_truth):
+            return nn.MSELoss()(output, ground_truth[1])

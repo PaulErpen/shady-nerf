@@ -1,11 +1,11 @@
 from typing import Any, Callable
 import torch.nn as nn
 from torch import optim
-import torch.nn.modules.loss as loss
 from torch.utils.data.dataset import Dataset
 from torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
 from lodnelf.util import util
+from lodnelf.train.loss import _LossFn
 
 
 class TrainExecutor:
@@ -13,7 +13,7 @@ class TrainExecutor:
         self,
         model: nn.Module,
         optimizer: optim.Optimizer,
-        loss: loss._Loss,
+        loss: _LossFn,
         batch_size: int,
         device="cpu",
     ):
@@ -40,14 +40,13 @@ class TrainExecutor:
             model_input = batch
             if prepare_input_fn is not None:
                 model_input = prepare_input_fn(batch)
-            ground_truth = batch["rgb"]
-            images = util.to_device(model_input, self.device)
-            ground_truth = util.to_device(ground_truth, self.device)
+            model_input = util.to_device(model_input, self.device)
+            batch = util.to_device(batch, self.device)
 
             self.optimizer.zero_grad()
 
-            output = self.model(images)
-            loss = self.loss(output, ground_truth)
+            output = self.model(model_input)
+            loss = self.loss(output, batch)
             loss.backward()
             total_loss += loss.item()
 
