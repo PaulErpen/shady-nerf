@@ -1,5 +1,6 @@
-'''For general notes on Plucker coordinates:
-https://faculty.sites.iastate.edu/jia/files/inline-files/plucker-coordinates.pdf'''
+"""For general notes on Plucker coordinates:
+https://faculty.sites.iastate.edu/jia/files/inline-files/plucker-coordinates.pdf"""
+
 import numpy as np
 import torch
 
@@ -12,10 +13,10 @@ def get_ray_origin(cam2world):
 
 
 def plucker_embedding(cam2world, uv, intrinsics):
-    '''Computes the plucker coordinates from batched cam2world & intrinsics matrices, as well as pixel coordinates
+    """Computes the plucker coordinates from batched cam2world & intrinsics matrices, as well as pixel coordinates
     cam2world: (b, 4, 4)
     intrinsics: (b, 4, 4)
-    uv: (b, n, 2)'''
+    uv: (b, n, 2)"""
     ray_dirs = get_ray_directions(uv, cam2world=cam2world, intrinsics=intrinsics)
     cam_pos = get_ray_origin(cam2world)
     cam_pos = cam_pos[..., None, :].expand(list(uv.shape[:-1]) + [3])
@@ -28,47 +29,50 @@ def plucker_embedding(cam2world, uv, intrinsics):
 
 
 def closest_to_origin(plucker_coord):
-    '''Computes the point on a plucker line closest to the origin.'''
+    """Computes the point on a plucker line closest to the origin."""
     direction = plucker_coord[..., :3]
     moment = plucker_coord[..., 3:]
     return torch.cross(direction, moment, dim=-1)
 
 
 def plucker_sd(plucker_coord, point_coord):
-    '''Computes the signed distance of a point on a line to the point closest to the origin
-    (like a local coordinate system on a plucker line)'''
+    """Computes the signed distance of a point on a line to the point closest to the origin
+    (like a local coordinate system on a plucker line)"""
     # Get closest point to origin along plucker line.
     plucker_origin = closest_to_origin(plucker_coord)
 
     # Compute signed distance: offset times dot product.
     direction = plucker_coord[..., :3]
     diff = point_coord - plucker_origin
-    signed_distance = torch.einsum('...j,...j', diff, direction)
+    signed_distance = torch.einsum("...j,...j", diff, direction)
     return signed_distance[..., None]
 
 
-def get_relative_rotation_matrix(vector_1, vector_2):
+def get_relative_rotation_matrix(vector_1, vector_2, device="cpu"):
     "https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d"
     a_plus_b = vector_1 + vector_2
     outer = a_plus_b.unsqueeze(-2) * a_plus_b.unsqueeze(-1)
-    dot = torch.einsum('...j,...j', a_plus_b, a_plus_b)[..., None, None]
-    R = 2 * outer/dot - torch.eye(3)[None, None, None].cuda()
+    dot = torch.einsum("...j,...j", a_plus_b, a_plus_b)[..., None, None]
+    R = 2 * outer / dot - torch.eye(3)[None, None, None].to(device)
     return R
 
 
 def plucker_reciprocal_product(line_1, line_2):
-    '''Computes the reciprocal product between plucker coordinates. See:
-    https://faculty.sites.iastate.edu/jia/files/inline-files/plucker-coordinates.pdf'''
-    return torch.einsum('...j,...j', line_1[..., :3], line_2[..., 3:]) + \
-           torch.einsum('...j,...j', line_2[..., :3], line_1[..., 3:])
+    """Computes the reciprocal product between plucker coordinates. See:
+    https://faculty.sites.iastate.edu/jia/files/inline-files/plucker-coordinates.pdf"""
+    return torch.einsum("...j,...j", line_1[..., :3], line_2[..., 3:]) + torch.einsum(
+        "...j,...j", line_2[..., :3], line_1[..., 3:]
+    )
 
 
 def plucker_distance(line_1, line_2):
-    '''Computes the distance between the two closest points on lines parameterized as plucker coordinates.'''
+    """Computes the distance between the two closest points on lines parameterized as plucker coordinates."""
     line_1_dir, line_2_dir = torch.broadcast_tensors(line_1[..., :3], line_2[..., :3])
     direction_cross = torch.cross(line_1_dir, line_2_dir, dim=-1)
     # https://web.cs.iastate.edu/~cs577/handouts/plucker-coordinates.pdf
-    return torch.abs(plucker_reciprocal_product(line_1, line_2))/direction_cross.norm(dim=-1)
+    return torch.abs(plucker_reciprocal_product(line_1, line_2)) / direction_cross.norm(
+        dim=-1
+    )
 
 
 def compute_normal_map(x_img, y_img, z, intrinsics):
@@ -88,22 +92,24 @@ def compute_normal_map(x_img, y_img, z, intrinsics):
     return cross
 
 
-def get_ray_directions_cam(uv, intrinsics):
-    '''Translates meshgrid of uv pixel coordinates to normalized directions of rays through these pixels,
+def get_ray_directions_cam(uv, intrinsics, device="cpu"):
+    """Translates meshgrid of uv pixel coordinates to normalized directions of rays through these pixels,
     in camera coordinates.
-    '''
+    """
     x_cam = uv[..., 0]
     y_cam = uv[..., 1]
-    z_cam = torch.ones_like(x_cam).cuda()
+    z_cam = torch.ones_like(x_cam).to(device)
 
-    pixel_points_cam = lift(x_cam, y_cam, z_cam, intrinsics=intrinsics, homogeneous=False)  # (batch_size, -1, 4)
+    pixel_points_cam = lift(
+        x_cam, y_cam, z_cam, intrinsics=intrinsics, homogeneous=False
+    )  # (batch_size, -1, 4)
     ray_dirs = F.normalize(pixel_points_cam, dim=-1)
     return ray_dirs
 
 
-def reflect_vector_on_vector(vector_to_reflect, reflection_axis):
-    refl = F.normalize(vector_to_reflect.cuda())
-    ax = F.normalize(reflection_axis.cuda())
+def reflect_vector_on_vector(vector_to_reflect, reflection_axis, device="cpu"):
+    refl = F.normalize(vector_to_reflect.to(device))
+    ax = F.normalize(reflection_axis.to(device))
 
     r = 2 * (ax * refl).sum(dim=1, keepdim=True) * ax - refl
     return r
@@ -128,7 +134,7 @@ def expand_as(x, y):
 
 
 def lift(x, y, z, intrinsics, homogeneous=False):
-    '''
+    """
 
     :param self:
     :param x: Shape (batch_size, num_points)
@@ -136,7 +142,7 @@ def lift(x, y, z, intrinsics, homogeneous=False):
     :param z:
     :param intrinsics:
     :return:
-    '''
+    """
     fx, fy, cx, cy = parse_intrinsics(intrinsics)
 
     x_lift = (x - expand_as(cx, x)) / expand_as(fx, x) * z
@@ -149,7 +155,7 @@ def lift(x, y, z, intrinsics, homogeneous=False):
 
 
 def project(x, y, z, intrinsics):
-    '''
+    """
 
     :param self:
     :param x: Shape (batch_size, num_points)
@@ -157,7 +163,7 @@ def project(x, y, z, intrinsics):
     :param z:
     :param intrinsics:
     :return:
-    '''
+    """
     fx, fy, cx, cy = parse_intrinsics(intrinsics)
 
     x_proj = expand_as(fx, x) * x / z + expand_as(cx, x)
@@ -173,20 +179,26 @@ def world_from_xy_depth(xy, depth, cam2world, intrinsics):
     y_cam = xy[..., 1]
     z_cam = depth
 
-    pixel_points_cam = lift(x_cam, y_cam, z_cam, intrinsics=intrinsics, homogeneous=True)
-    world_coords = torch.einsum('b...ij,b...kj->b...ki', cam2world, pixel_points_cam)[..., :3]
+    pixel_points_cam = lift(
+        x_cam, y_cam, z_cam, intrinsics=intrinsics, homogeneous=True
+    )
+    world_coords = torch.einsum("b...ij,b...kj->b...ki", cam2world, pixel_points_cam)[
+        ..., :3
+    ]
 
     return world_coords
 
 
 def project_point_on_line(projection_point, line_direction, point_on_line):
-    dot = torch.einsum('...j,...j', projection_point-point_on_line, line_direction)
+    dot = torch.einsum("...j,...j", projection_point - point_on_line, line_direction)
     return point_on_line + dot[..., None] * line_direction
 
 
 def get_ray_directions(xy, cam2world, intrinsics):
     z_cam = torch.ones(xy.shape[:-1]).to(xy.device)
-    pixel_points = world_from_xy_depth(xy, z_cam, intrinsics=intrinsics, cam2world=cam2world)  # (batch, num_samples, 3)
+    pixel_points = world_from_xy_depth(
+        xy, z_cam, intrinsics=intrinsics, cam2world=cam2world
+    )  # (batch, num_samples, 3)
 
     cam_pos = cam2world[..., :3, 3]
     ray_dirs = pixel_points - cam_pos[..., None, :]  # (batch, num_samples, 3)
@@ -194,11 +206,12 @@ def get_ray_directions(xy, cam2world, intrinsics):
     return ray_dirs
 
 
-def depth_from_world(world_coords, cam2world):
+def depth_from_world(world_coords, cam2world, device='cpu'):
     batch_size, num_samples, _ = world_coords.shape
 
-    points_hom = torch.cat((world_coords, torch.ones((batch_size, num_samples, 1)).cuda()),
-                           dim=2)  # (batch, num_samples, 4)
+    points_hom = torch.cat(
+        (world_coords, torch.ones((batch_size, num_samples, 1)).to(device)), dim=2
+    )  # (batch, num_samples, 4)
 
     # permute for bmm
     points_hom = points_hom.permute(0, 2, 1)
@@ -212,9 +225,21 @@ def ray_sphere_intersect(ray_origin, ray_dir, sphere_center=None, radius=1):
     if sphere_center is None:
         sphere_center = torch.zeros_like(ray_origin)
 
-    ray_dir_dot_origin = torch.einsum('b...jd,b...id->b...ji', ray_dir, ray_origin - sphere_center)
-    discrim = torch.sqrt( ray_dir_dot_origin**2 - (torch.einsum('b...id,b...id->b...i', ray_origin-sphere_center, ray_origin - sphere_center)[..., None] - radius**2) )
+    ray_dir_dot_origin = torch.einsum(
+        "b...jd,b...id->b...ji", ray_dir, ray_origin - sphere_center
+    )
+    discrim = torch.sqrt(
+        ray_dir_dot_origin**2
+        - (
+            torch.einsum(
+                "b...id,b...id->b...i",
+                ray_origin - sphere_center,
+                ray_origin - sphere_center,
+            )[..., None]
+            - radius**2
+        )
+    )
 
-    t0 = - ray_dir_dot_origin + discrim
-    t1 = - ray_dir_dot_origin - discrim
-    return ray_origin + t0*ray_dir, ray_origin + t1*ray_dir
+    t0 = -ray_dir_dot_origin + discrim
+    t1 = -ray_dir_dot_origin - discrim
+    return ray_origin + t0 * ray_dir, ray_origin + t1 * ray_dir

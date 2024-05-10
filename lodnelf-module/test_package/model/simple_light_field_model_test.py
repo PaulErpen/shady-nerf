@@ -39,3 +39,21 @@ class SimpleLightFieldModelTest(unittest.TestCase):
 
         plt.imshow(rgb.reshape(128, 128, 3).detach().cpu().numpy())
         plt.show()
+
+    def test_given_a_model_that_predicts_the_depth__when_forwarding_through_the_model__then_output_is_correct(self):
+        model = SimpleLightFieldModel(latent_dim=256, depth=True, alpha=False)
+
+        query = self.dataset[0][0]
+        model_input = util.assemble_model_input(query, query)
+        output = model(model_input)
+
+        self.assertIn('depth', output)
+
+    def test_given_a_model_that_predicts_the_alpha__when_forwarding_through_the_model__then_output_is_correct(self):
+        model = SimpleLightFieldModel(latent_dim=256, depth=False, alpha=True)
+
+        query = self.dataset[0][0]
+        model_input = util.assemble_model_input(query, query)
+        output = model(model_input)
+
+        self.assertIn('alpha', output)
