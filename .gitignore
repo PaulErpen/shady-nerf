@@ -2,3 +2,4 @@
 **/*.egg-info/**
 **/*.hdf5
 .vscode
+models
