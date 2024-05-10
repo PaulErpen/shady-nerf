@@ -13,6 +13,7 @@ setup(
         "pandas>=1.3.3",
         "imageio>=2.34.1",
         "scikit-image>=0.23.2",
-        "h5py>=3.11.0"
+        "h5py>=3.11.0",
+        "tqdm==2.2.3",
     ],
 )

@@ -51,11 +51,11 @@ class SimpleLightFieldModel(nn.Module):
         query_pose, query_intrinsics, query_uv = self.get_query_cam(input)
 
         light_field_coords = geometry.plucker_embedding(
-            query_pose, query_uv, query_intrinsics
+            query["cam2world"], query["uv"], query["intrinsics"]
         )
 
         light_field_coords.requires_grad_(True)
-        out_dict["coords"] = light_field_coords.view(b * n_qry, n_pix, 6)
+        out_dict["coords"] = light_field_coords.view(b, n_qry, 6)
 
         lf_function = self.get_light_field_function()
         out_dict["lf_function"] = lf_function
@@ -72,12 +72,12 @@ class SimpleLightFieldModel(nn.Module):
 
         if self.depth:
             depth = lf_out[..., 3:4]
-            out_dict["depth"] = depth.view(b, n_qry, n_pix, 1)
+            out_dict["depth"] = depth.view(b, n_qry, 1)
 
-        rgb = rgb.view(b, n_qry, n_pix, 3)
+        rgb = rgb.view(b, n_qry, 3)
 
         if self.alpha:
-            alpha = lf_out[..., -1:].view(b, n_qry, n_pix, 1)
+            alpha = lf_out[..., -1:].view(b, n_qry, 1)
             weight = 1 - torch.exp(-torch.abs(alpha))
             rgb = weight * rgb + (1 - weight) * self.background
             out_dict["alpha"] = weight

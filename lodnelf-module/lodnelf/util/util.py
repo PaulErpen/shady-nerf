@@ -322,13 +322,13 @@ def get_mgrid(sidelen, dim=2, flatten=False):
     return pixel_coords
 
 
-def dict_to_device(ob, device="cpu"):
+def to_device(ob, device="cpu"):
     if isinstance(ob, dict):
-        return {k: dict_to_device(v) for k, v in ob.items()}
+        return {k: to_device(v) for k, v in ob.items()}
     elif isinstance(ob, tuple):
-        return tuple(dict_to_device(k) for k in ob)
+        return tuple(to_device(k) for k in ob)
     elif isinstance(ob, list):
-        return [dict_to_device(k) for k in ob]
+        return [to_device(k) for k in ob]
     else:
         try:
             return ob.to(device)
@@ -340,14 +340,8 @@ def assemble_model_input(context, query, gpu=True):
     context["mask"] = torch.Tensor([1.0])
     query["mask"] = torch.Tensor([1.0])
 
-    context = add_batch_dim_to_dict(context)
-    context = add_batch_dim_to_dict(context)
-
-    query = add_batch_dim_to_dict(query)
-    query = add_batch_dim_to_dict(query)
-
     model_input = {"context": context, "query": query, "post_input": query}
 
     if gpu:
-        model_input = dict_to_device(model_input)
+        model_input = to_device(model_input)
     return model_input
