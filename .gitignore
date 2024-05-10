@@ -1,0 +1,4 @@
+**/*.pyc
+**/*.egg-info/**
+**/*.hdf5
+.vscode
