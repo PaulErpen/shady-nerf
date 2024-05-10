@@ -22,10 +22,10 @@ executor = TrainExecutor(
     loss=LFLoss(),
     batch_size=5,
 )
-model_save_path = Path("models/experiment_1")
+model_save_path = Path("models/experiment_2")
 model_save_path.mkdir(exist_ok=True)
 train_handler = TrainHandler(
-    max_epochs=10,
+    max_epochs=150,
     dataset=dataset,
     train_executor=executor,
     prepare_input_fn=lambda x: util.assemble_model_input(x, x),
