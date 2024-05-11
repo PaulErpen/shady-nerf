@@ -13,7 +13,7 @@ dataset = get_instance_datasets_hdf5(
 )[0]
 
 simple_model = SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
-state_dict = torch.load("models/experiment_1/model_epoch_9.pt", map_location="cpu")
+state_dict = torch.load("models/experiment_2/model_epoch_41.pt", map_location="cpu")
 simple_model.load_state_dict(state_dict)
 
 fig, axs = plt.subplots(1, 10, figsize=(18, 3))

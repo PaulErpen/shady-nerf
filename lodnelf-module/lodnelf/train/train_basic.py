@@ -29,7 +29,7 @@ train_handler = TrainHandler(
     dataset=dataset,
     train_executor=executor,
     prepare_input_fn=lambda x: util.assemble_model_input(x, x),
-    stop_after_no_improvement=3,
+    stop_after_no_improvement=150,
     model_save_path=model_save_path,
 )
 train_handler.run()
