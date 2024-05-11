@@ -8,8 +8,7 @@ class WandBLoggerTest(unittest.TestCase):
         self,
     ):
         wandb_api_key: str = str(os.getenv("WANDB_API_KEY"))
-        WandBLogger(
-            wandb_api_key=wandb_api_key,
+        WandBLogger.from_env(
             run_config={"config": "config"},
             run_name="run_name",
             group_name="unittest",

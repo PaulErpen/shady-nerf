@@ -19,9 +19,13 @@ class TrainHandlerTest(unittest.TestCase):
             train_executor=self.MockedTrainExecutor(
                 self.MockedModel(), self.MockedLoss()
             ),
+            train_config={"config": "config"},
+            group_name="unittest",
         )
-    
-    def test_given_a_model_with_improving_loss__when_running__then_save_the_model_to_the_specified_path(self):
+
+    def test_given_a_model_with_improving_loss__when_running__then_save_the_model_to_the_specified_path(
+        self,
+    ):
         model_save_path = Path("model_save_path")
         model_save_path.mkdir(exist_ok=True)
         train_handler = TrainHandler(
@@ -31,8 +35,10 @@ class TrainHandlerTest(unittest.TestCase):
                 self.MockedModel(), self.MockedLoss(), is_improving=True
             ),
             model_save_path=model_save_path,
+            train_config={"config": "config"},
+            group_name="unittest",
         )
-        train_handler.run()
+        train_handler.run("unittest_run")
         self.assertTrue((model_save_path / "model_epoch_0.pt").exists())
         self.assertTrue((model_save_path / "model_epoch_1.pt").exists())
         self.assertTrue((model_save_path / "model_epoch_2.pt").exists())
@@ -43,8 +49,10 @@ class TrainHandlerTest(unittest.TestCase):
         for i in range(5):
             (model_save_path / f"model_epoch_{i}.pt").unlink()
         model_save_path.rmdir()
-    
-    def test_given_a_model_with_no_improving_loss__when_running__then_only_save_the_first_model(self):
+
+    def test_given_a_model_with_no_improving_loss__when_running__then_only_save_the_first_model(
+        self,
+    ):
         model_save_path = Path("model_save_path")
         model_save_path.mkdir(exist_ok=True)
         train_handler = TrainHandler(
@@ -54,8 +62,10 @@ class TrainHandlerTest(unittest.TestCase):
                 self.MockedModel(), self.MockedLoss(), is_improving=False
             ),
             model_save_path=model_save_path,
+            train_config={"config": "config"},
+            group_name="unittest",
         )
-        train_handler.run()
+        train_handler.run("unittest_run")
         self.assertTrue((model_save_path / "model_epoch_0.pt").exists())
         self.assertFalse((model_save_path / "model_epoch_1.pt").exists())
         self.assertFalse((model_save_path / "model_epoch_2.pt").exists())
