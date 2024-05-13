@@ -47,7 +47,7 @@ echo "================ ================ ================ ================"
 python3 -m pip install --user -e ./shady-nerf/lodnelf-module
 
 ## Run your workload
-srun --gres=gpu:1 python3 -m lodnelf.train.train_cmd --run_name "experiment_alpha_1" --config "SimpleRedCarModel" --model_save_dir "models/experiment_alpha_1" --data_dir "data"
+srun --gres=gpu:1 python3 -m lodnelf.train.train_cmd --run_name "experiment_alpha_2" --config "SimpleRedCarModel" --model_save_dir "models/experiment_alpha_2" --data_dir "data"
 
 ## Make sure to wait for everything to complete
 wait
