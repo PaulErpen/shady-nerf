@@ -44,7 +44,7 @@ python3 --version
 echo "================ ================ ================ ================"
 
 ## Installing my own module
-python3 -m pip install --user -e ./lodnelf-module
+python3 -m pip install --user -e ./shady-nerf/lodnelf-module
 
 ## Run your workload
 srun --gres=gpu:1 python3 -m lodnelf.train.train_cmd --run_name "experiment_big_1" --config "SimpleRedCarModel" --model_save_dir "models/experiment_big_1" --data_dir "data"
