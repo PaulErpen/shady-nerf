@@ -25,7 +25,7 @@ class SimpleRedCarModelConfig(AbstractConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(5),
+            "batch_size": str(1),
             "max_epochs": str(150),
             "model_description": "SimpleLightFieldModel with latent_dim=256, depth=False, alpha=False",
             "dataset": "cars_train.hdf5",
@@ -47,7 +47,7 @@ class SimpleRedCarModelConfig(AbstractConfig):
             model=simple_model,
             optimizer=torch.optim.AdamW(simple_model.parameters(), lr=1e-4),
             loss=LFLoss(),
-            batch_size=5,
+            batch_size=1,
         )
         model_save_path.mkdir(exist_ok=True)
         train_handler = TrainHandler(
