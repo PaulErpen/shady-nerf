@@ -1,6 +1,4 @@
-from lodnelf.model.simple_light_field_model import SimpleLightFieldModel
 import torch
-from lodnelf.data.hdf5dataset import get_instance_datasets_hdf5
 from lodnelf.util import util
 from matplotlib import pyplot as plt
 from lodnelf.train.config.config_factory import ConfigFactory
