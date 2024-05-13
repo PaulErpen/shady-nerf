@@ -36,7 +36,7 @@ class SimpleRedCarModelConfig(AbstractConfig):
         return "SimpleRedCarModel"
 
     def get_model(self):
-        return SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
+        return SimpleLightFieldModel(latent_dim=256 * 2, depth=False, alpha=False)
 
     def get_data_set(self, data_directory: str):
         return get_red_car_dataset(data_directory)

@@ -44,7 +44,7 @@ python3 --version
 echo "================ ================ ================ ================"
 
 ## Run your workload
-cd "shady-nerf/lodnelf-module"
+cd "lodnelf-module"
 srun --gres=gpu:1 python3 -m lodnelf.train.train_cmd --run_name "experiment_big_1" --config "SimpleRedCarModel" --model_save_dir "../../models/experiment_big_1" --data_dir "../../data"
 
 ## Make sure to wait for everything to complete
