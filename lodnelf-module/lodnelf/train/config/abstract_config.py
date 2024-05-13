@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict
-from lodnelf.train.train_handler import TrainHandler
 from pathlib import Path
+from torch import nn
+import torch.utils.data
 
 
 class AbstractConfig(ABC):
@@ -10,6 +11,14 @@ class AbstractConfig(ABC):
 
     @abstractmethod
     def get_name(self) -> str:
+        pass
+
+    @abstractmethod
+    def get_model(self) -> nn.Module:
+        pass
+
+    @abstractmethod
+    def get_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
         pass
 
     @abstractmethod

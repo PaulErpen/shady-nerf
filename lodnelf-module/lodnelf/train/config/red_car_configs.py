@@ -35,14 +35,20 @@ class SimpleRedCarModelConfig(AbstractConfig):
     def get_name(self) -> str:
         return "SimpleRedCarModel"
 
+    def get_model(self):
+        return SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
+
+    def get_data_set(self, data_directory: str):
+        return get_red_car_dataset(data_directory)
+
     def run(self, run_name: str, model_save_path: Path, data_directory: str):
         self.config["run_name"] = run_name
         self.config["model_save_path"] = str(model_save_path)
         self.config["data_directory"] = data_directory
 
-        dataset = get_red_car_dataset(data_directory)
-        
-        simple_model = SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
+        dataset = self.get_data_set(data_directory)
+
+        simple_model = self.get_model()
         executor = TrainExecutor(
             model=simple_model,
             optimizer=torch.optim.AdamW(simple_model.parameters(), lr=1e-4),
