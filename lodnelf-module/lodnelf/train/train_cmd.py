@@ -14,7 +14,7 @@ def run_training(config_name, run_name, model_save_dir, data_dir):
     else:
         print("Using CPU.")
 
-    config.run(run_name, Path(model_save_dir), data_dir, device=device)
+    # config.run(run_name, Path(model_save_dir), data_dir, device=device)
 
 
 if __name__ == "__main__":
