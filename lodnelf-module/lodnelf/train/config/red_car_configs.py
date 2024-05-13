@@ -27,7 +27,7 @@ class SimpleRedCarModelConfig(AbstractConfig):
             "loss": "LFLoss",
             "batch_size": str(1),
             "max_epochs": str(150),
-            "model_description": "SimpleLightFieldModel with latent_dim=256, depth=False, alpha=True",
+            "model_description": "SimpleLightFieldModel with latent_dim=256, depth=True, alpha=True",
             "dataset": "cars_train.hdf5",
         }
         super().__init__(config)
@@ -36,7 +36,7 @@ class SimpleRedCarModelConfig(AbstractConfig):
         return "SimpleRedCarModel"
 
     def get_model(self):
-        return SimpleLightFieldModel(latent_dim=256, depth=False, alpha=True)
+        return SimpleLightFieldModel(latent_dim=256, depth=True, alpha=True)
 
     def get_data_set(self, data_directory: str):
         return get_red_car_dataset(data_directory)
