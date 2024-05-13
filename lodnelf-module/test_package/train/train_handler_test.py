@@ -108,6 +108,7 @@ class TrainHandlerTest(unittest.TestCase):
                 optimizer=AdamW(model.parameters(), lr=0.001),
                 loss=loss,
                 batch_size=3,
+                device="cpu",
             )
             self.loss = 10.0
             self.is_improving = is_improving

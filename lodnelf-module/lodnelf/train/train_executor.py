@@ -15,7 +15,7 @@ class TrainExecutor:
         optimizer: optim.Optimizer,
         loss: _LossFn,
         batch_size: int,
-        device="cpu",
+        device: str,
     ):
         self.model = model
         self.optimizer = optimizer

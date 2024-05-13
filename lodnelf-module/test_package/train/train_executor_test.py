@@ -28,6 +28,7 @@ class TrainExecutorTest(unittest.TestCase):
             optimizer=torch.optim.Adam(self.MockedModel().parameters()),
             loss=self.MockedLoss(),
             batch_size=3,
+            device="cpu",
         )
         dataset = self.MockedDataset()
 
@@ -43,6 +44,7 @@ class TrainExecutorTest(unittest.TestCase):
             optimizer=torch.optim.Adam(self.MockedModel().parameters()),
             loss=LFLoss(),
             batch_size=3,
+            device="cpu",
         )
 
         executor.train(

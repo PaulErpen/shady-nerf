@@ -1,12 +1,20 @@
 import argparse
 from lodnelf.train.config.config_factory import ConfigFactory
 from pathlib import Path
+import torch
 
 
 def run_training(config_name, run_name, model_save_dir, data_dir):
     config_factory = ConfigFactory()
     config = config_factory.get_by_name(config_name)
-    config.run(run_name, Path(model_save_dir), data_dir)
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    if device == "cuda":
+        print("Using CUDA.")
+    else:
+        print("Using CPU.")
+
+    config.run(run_name, Path(model_save_dir), data_dir, device=device)
 
 
 if __name__ == "__main__":

@@ -41,7 +41,9 @@ class SimpleRedCarModelConfig(AbstractConfig):
     def get_data_set(self, data_directory: str):
         return get_red_car_dataset(data_directory)
 
-    def run(self, run_name: str, model_save_path: Path, data_directory: str):
+    def run(
+        self, run_name: str, model_save_path: Path, data_directory: str, device: str
+    ):
         self.config["run_name"] = run_name
         self.config["model_save_path"] = str(model_save_path)
         self.config["data_directory"] = data_directory
@@ -54,6 +56,7 @@ class SimpleRedCarModelConfig(AbstractConfig):
             optimizer=torch.optim.AdamW(simple_model.parameters(), lr=1e-4),
             loss=LFLoss(),
             batch_size=1,
+            device=device,
         )
         model_save_path.mkdir(exist_ok=True)
         train_handler = TrainHandler(

@@ -22,5 +22,5 @@ class AbstractConfig(ABC):
         pass
 
     @abstractmethod
-    def run(self, run_name: str, model_save_path: Path, data_directory: str):
+    def run(self, run_name: str, model_save_path: Path, data_directory: str, device: str):
         pass
