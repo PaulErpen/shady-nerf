@@ -44,7 +44,7 @@ python3 --version
 echo "================ ================ ================ ================"
 
 ## Getting extra python packages
-python3 -m pip install opencv-python
+python3 -m pip install --user opencv-python
 
 ## Run your workload
 cd "lodnelf-module"
