@@ -54,8 +54,9 @@ def run_testing(config_name, model_path, data_dir, plot_alpha=False, plot_depth=
             )
 
         if "depth" in output and plot_depth:
+            max_depth = output["depth"].max()
             axs[n_rows - 1][i].imshow(
-                output["depth"].reshape(128, 128, 1).detach().cpu().numpy(),
+                1 - (output["depth"] / max_depth).reshape(128, 128, 1).detach().cpu().numpy(),
                 cmap="gray",
             )
 
