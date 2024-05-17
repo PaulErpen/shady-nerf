@@ -36,22 +36,20 @@ class SimpleLightFieldModel(nn.Module):
         return self.phi
 
     def get_query_cam(self, input):
-        query_dict = input["query"]
-        pose = util.flatten_first_two(query_dict["cam2world"])
-        intrinsics = util.flatten_first_two(query_dict["intrinsics"])
-        uv = util.flatten_first_two(query_dict["uv"].float())
+        pose = util.flatten_first_two(input["cam2world"])
+        intrinsics = util.flatten_first_two(input["intrinsics"])
+        uv = util.flatten_first_two(input["uv"].float())
         return pose, intrinsics, uv
 
     def forward(self, input, val=False, compute_depth=False, timing=False):
         out_dict = {}
-        query = input["query"]
-        b, n_ctxt = query["uv"].shape[:2]
-        n_qry, n_pix = query["uv"].shape[1:3]
+        b = input["uv"].shape[0]
+        n_qry, n_pix = input["uv"].shape[1:3]
 
         query_pose, query_intrinsics, query_uv = self.get_query_cam(input)
 
         light_field_coords = geometry.plucker_embedding(
-            query["cam2world"], query["uv"], query["intrinsics"]
+            input["cam2world"], input["uv"], input["intrinsics"]
         )
 
         light_field_coords.requires_grad_(True)

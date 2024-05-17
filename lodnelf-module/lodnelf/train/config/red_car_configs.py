@@ -49,7 +49,6 @@ class AbstractSimpleRedCarModelConfig(AbstractConfig):
             max_epochs=150,
             dataset=dataset,
             train_executor=executor,
-            prepare_input_fn=lambda x: util.assemble_model_input(x, x),
             stop_after_no_improvement=150,
             model_save_path=model_save_path,
             train_config=self.config,

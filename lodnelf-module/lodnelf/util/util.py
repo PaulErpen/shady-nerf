@@ -334,14 +334,3 @@ def to_device(ob, device="cpu"):
             return ob.to(device)
         except:
             return ob
-
-
-def assemble_model_input(context, query, gpu=True):
-    context["mask"] = torch.Tensor([1.0])
-    query["mask"] = torch.Tensor([1.0])
-
-    model_input = {"context": context, "query": query, "post_input": query}
-
-    if gpu:
-        model_input = to_device(model_input)
-    return model_input

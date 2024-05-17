@@ -47,9 +47,7 @@ class TrainExecutorTest(unittest.TestCase):
             device="cpu",
         )
 
-        executor.train(
-            self.dataset, prepare_input_fn=lambda x: util.assemble_model_input(x, x)
-        )
+        executor.train(self.dataset)
 
         self.assertTrue(True)
 

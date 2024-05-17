@@ -39,9 +39,7 @@ def run_testing(config_name, model_path, data_dir, plot_alpha=False, plot_depth=
 
     for i in range(10):
         query = dataset[i]
-        model_input = util.add_batch_dim_to_dict(
-            util.assemble_model_input(query, query)
-        )
+        model_input = util.add_batch_dim_to_dict(query)
         output = model(model_input)
 
         axs[0][i].imshow(query["rgb"].reshape(128, 128, 3).detach().cpu().numpy())
@@ -56,7 +54,12 @@ def run_testing(config_name, model_path, data_dir, plot_alpha=False, plot_depth=
         if "depth" in output and plot_depth:
             max_depth = output["depth"].max()
             axs[n_rows - 1][i].imshow(
-                1 - (output["depth"] / max_depth).reshape(128, 128, 1).detach().cpu().numpy(),
+                1
+                - (output["depth"] / max_depth)
+                .reshape(128, 128, 1)
+                .detach()
+                .cpu()
+                .numpy(),
                 cmap="gray",
             )
 

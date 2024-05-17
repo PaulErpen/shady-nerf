@@ -28,9 +28,7 @@ class SimpleLightFieldModelTest(unittest.TestCase):
         model = SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
 
         query = self.dataset[0][0]
-        model_input = util.add_batch_dim_to_dict(
-            util.assemble_model_input(query, query)
-        )
+        model_input = util.add_batch_dim_to_dict(query)
         output = model(model_input)
 
         self.assertIsNotNone(output)
@@ -41,9 +39,7 @@ class SimpleLightFieldModelTest(unittest.TestCase):
         model = SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
 
         query = self.dataset[0][0]
-        model_input = util.add_batch_dim_to_dict(
-            util.assemble_model_input(query, query)
-        )
+        model_input = util.add_batch_dim_to_dict(query)
         output = model(model_input)
 
         rgb = output["rgb"]
@@ -57,9 +53,7 @@ class SimpleLightFieldModelTest(unittest.TestCase):
         model = SimpleLightFieldModel(latent_dim=256, depth=True, alpha=False)
 
         query = self.dataset[0][0]
-        model_input = util.add_batch_dim_to_dict(
-            util.assemble_model_input(query, query)
-        )
+        model_input = util.add_batch_dim_to_dict(query)
         output = model(model_input)
 
         self.assertIn("depth", output)
@@ -70,9 +64,7 @@ class SimpleLightFieldModelTest(unittest.TestCase):
         model = SimpleLightFieldModel(latent_dim=256, depth=False, alpha=True)
 
         query = self.dataset[0][0]
-        model_input = util.add_batch_dim_to_dict(
-            util.assemble_model_input(query, query)
-        )
+        model_input = util.add_batch_dim_to_dict(query)
         output = model(model_input)
 
         self.assertIn("alpha", output)
