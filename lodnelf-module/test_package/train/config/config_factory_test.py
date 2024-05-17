@@ -1,6 +1,6 @@
 import unittest
 from lodnelf.train.config.config_factory import ConfigFactory
-from lodnelf.train.config.red_car_configs import SimpleRedCarModelConfig
+from lodnelf.train.config.red_car_configs import SimpleRedCarModelConfigDepthAlpha
 
 
 class ConfigFactoryTest(unittest.TestCase):
@@ -9,7 +9,7 @@ class ConfigFactoryTest(unittest.TestCase):
     ):
         factory = ConfigFactory()
         config = factory.get_by_name("SimpleRedCarModel")
-        self.assertIsInstance(config, SimpleRedCarModelConfig)
+        self.assertIsInstance(config, SimpleRedCarModelConfigDepthAlpha)
     
     def test_given_an_invalid_config_name__when_getting_by_name__then_throw_error(
         self,
