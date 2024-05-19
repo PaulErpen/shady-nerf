@@ -93,3 +93,24 @@ class SimpleRedCarModelConfig(AbstractSimpleRedCarModelConfig):
 
     def get_model(self):
         return SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
+
+
+class SimpleRedCarModelConfigSiren(AbstractSimpleRedCarModelConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "SimpleLightFieldModel (Siren) with latent_dim=256, depth=False, alpha=False",
+            "dataset": "cars_train.hdf5",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "SimpleRedCarModelSiren"
+
+    def get_model(self):
+        return SimpleLightFieldModel(
+            latent_dim=256, depth=False, alpha=False, model_type="siren"
+        )

@@ -7,7 +7,9 @@ import time
 
 
 class SimpleLightFieldModel(nn.Module):
-    def __init__(self, latent_dim, depth=False, alpha=False, device="cpu"):
+    def __init__(
+        self, latent_dim, depth=False, alpha=False, device="cpu", model_type="fc"
+    ):
         super().__init__()
 
         self.latent_dim = latent_dim
@@ -23,30 +25,36 @@ class SimpleLightFieldModel(nn.Module):
             out_channels += 1
             self.background = torch.ones((1, 1, 1, 3)).to(device)
 
-        self.phi = custom_layers.FCBlock(
-            hidden_ch=self.num_hidden_units_phi,
-            num_hidden_layers=6,
-            in_features=6,
-            out_features=out_channels,
-            outermost_linear=True,
-            norm="layernorm_na",
-        )
+        if model_type == "fc":
+            self.phi = custom_layers.FCBlock(
+                hidden_ch=self.num_hidden_units_phi,
+                num_hidden_layers=6,
+                in_features=6,
+                out_features=out_channels,
+                outermost_linear=True,
+                norm="layernorm_na",
+            )
+        elif model_type == "siren":
+            omega_0 = 30.0
+            self.phi = custom_layers.Siren(
+                in_features=6,
+                hidden_features=256,
+                hidden_layers=8,
+                out_features=out_channels,
+                outermost_linear=True,
+                hidden_omega_0=omega_0,
+                first_omega_0=int(omega_0),
+            )
 
     def get_light_field_function(self):
         return self.phi
-
-    def get_query_cam(self, input):
-        pose = util.flatten_first_two(input["cam2world"])
-        intrinsics = util.flatten_first_two(input["intrinsics"])
-        uv = util.flatten_first_two(input["uv"].float())
-        return pose, intrinsics, uv
 
     def forward(self, input, val=False, compute_depth=False, timing=False):
         out_dict = {}
         b = input["uv"].shape[0]
         n_qry, n_pix = input["uv"].shape[1:3]
 
-        query_pose, query_intrinsics, query_uv = self.get_query_cam(input)
+        query_pose = util.flatten_first_two(input["cam2world"])
 
         light_field_coords = geometry.plucker_embedding(
             input["cam2world"], input["uv"], input["intrinsics"]
