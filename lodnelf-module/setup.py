@@ -15,6 +15,7 @@ setup(
         "scikit-image>=0.23.2",
         "h5py>=3.11.0",
         "tqdm==2.2.3",
-        "wandb==0.17.0"
+        "wandb==0.17.0",
+        "pygame==2.5.2"
     ],
 )

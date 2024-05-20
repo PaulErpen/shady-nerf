@@ -124,7 +124,7 @@ def convert_image(img, type):
     return img
 
 
-def flatten_first_two(tensor):
+def flatten_first_two(tensor: torch.Tensor):
     b, s, *rest = tensor.shape
     return tensor.view(b * s, *rest)
 
