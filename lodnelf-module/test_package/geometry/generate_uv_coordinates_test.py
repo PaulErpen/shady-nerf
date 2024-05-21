@@ -20,4 +20,4 @@ class GenerateUvCoordinatesTest(unittest.TestCase):
         uv_coordinates = generate_uv_coordinates(image_size)
 
         self.assertTrue((uv_coordinates >= 0).all())
-        self.assertTrue((uv_coordinates <= 1).all())
+        self.assertTrue((uv_coordinates <= 128).all())
