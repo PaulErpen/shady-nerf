@@ -77,10 +77,13 @@ class Hdf5DatasetTest(unittest.TestCase):
             sidelen=128,
             max_observations_per_instance=8,
         )
-        fig, axs = plt.subplots(1, 8, figsize=(16, 2))
-        for i in range(8):
-            sample = single_dataset[0][i]
-            axs[i].imshow(sample["rgb"].reshape(128, 128, 3))
+        fig, axs = plt.subplots(2, 4, figsize=(8, 4))
+        for i in range(2):
+            for j in range(4):
+                    sample = single_dataset[0][i * 4 + j]
+                    axs[i][j].imshow(sample["rgb"].reshape(128, 128, 3))
+                    # hide axis ticks and other elements
+                    axs[i][j].axis("off")
         plt.show()
 
     def test_given_an_hdf5_dataset__when_loading_a_single_observations_uv__then_it_should_conform_to_the_expected_shape(self):

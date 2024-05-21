@@ -95,7 +95,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         self,
     ):
         interactive_display = InteractiveDisplay(
-            "SimpleRedCarModelSiren", "models/experiment_siren_with_val_2/model_epoch_38.pt"
+            "SimpleRedCarModelSiren", "models/experiment_siren_with_val_2/model_epoch_23.pt"
         )
 
         interactive_display.run()
