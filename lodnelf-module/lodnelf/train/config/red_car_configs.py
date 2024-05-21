@@ -5,16 +5,26 @@ from lodnelf.train.train_executor import TrainExecutor
 import torch.optim
 from lodnelf.train.loss import LFLoss
 from lodnelf.train.train_handler import TrainHandler
+from lodnelf.train.validation_executor import ValidationExecutor
 from lodnelf.train.config.abstract_config import AbstractConfig
 from pathlib import Path
-from lodnelf.util import util
 
 
-def get_red_car_dataset(data_directory: str):
+def get_red_car_train_dataset(data_directory: str):
     return get_instance_datasets_hdf5(
         root=f"{data_directory}/hdf5/cars_train.hdf5",
         max_num_instances=1,
-        specific_observation_idcs=None,
+        specific_observation_idcs=list(range(42)),
+        sidelen=128,
+        max_observations_per_instance=None,
+    )[0]
+
+
+def get_red_car_val_dataset(data_directory: str):
+    return get_instance_datasets_hdf5(
+        root=f"{data_directory}/hdf5/cars_train.hdf5",
+        max_num_instances=1,
+        specific_observation_idcs=list(range(42, 50)),
         sidelen=128,
         max_observations_per_instance=None,
     )[0]
@@ -24,8 +34,11 @@ class AbstractSimpleRedCarModelConfig(AbstractConfig):
     def __init__(self, config: Dict[str, str]):
         super().__init__(config)
 
-    def get_data_set(self, data_directory: str):
-        return get_red_car_dataset(data_directory)
+    def get_train_data_set(self, data_directory: str):
+        return get_red_car_train_dataset(data_directory)
+
+    def get_val_data_set(self, data_directory: str):
+        return get_red_car_val_dataset(data_directory)
 
     def run(
         self, run_name: str, model_save_path: Path, data_directory: str, device: str
@@ -34,7 +47,8 @@ class AbstractSimpleRedCarModelConfig(AbstractConfig):
         self.config["model_save_path"] = str(model_save_path)
         self.config["data_directory"] = data_directory
 
-        dataset = self.get_data_set(data_directory)
+        train_dataset = self.get_train_data_set(data_directory)
+        val_dataset = self.get_val_data_set(data_directory)
 
         simple_model = self.get_model()
         executor = TrainExecutor(
@@ -43,12 +57,20 @@ class AbstractSimpleRedCarModelConfig(AbstractConfig):
             loss=LFLoss(),
             batch_size=1,
             device=device,
+            train_data=train_dataset,
+        )
+        val_executor = ValidationExecutor(
+            model=simple_model,
+            loss=LFLoss(),
+            batch_size=1,
+            device=device,
+            val_data=val_dataset,
         )
         model_save_path.mkdir(exist_ok=True)
         train_handler = TrainHandler(
             max_epochs=150,
-            dataset=dataset,
             train_executor=executor,
+            validation_executor=val_executor,
             stop_after_no_improvement=150,
             model_save_path=model_save_path,
             train_config=self.config,

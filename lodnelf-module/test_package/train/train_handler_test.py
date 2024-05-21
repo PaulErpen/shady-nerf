@@ -1,5 +1,6 @@
 import unittest
 from lodnelf.train.train_handler import TrainHandler
+from lodnelf.train.validation_executor import ValidationExecutor
 from lodnelf.train.train_executor import TrainExecutor
 import torch.nn as nn
 from torch.optim import AdamW
@@ -13,10 +14,12 @@ class TrainHandlerTest(unittest.TestCase):
     def test_given_a_valid_mocks__when_initializing__then_do_not_throw_errors(
         self,
     ):
-        train_handler = TrainHandler(
+        TrainHandler(
             max_epochs=10,
-            dataset=self.MockedDataset(),
             train_executor=self.MockedTrainExecutor(
+                self.MockedModel(), self.MockedLoss()
+            ),
+            validation_executor=self.MockedValidationExecutor(
                 self.MockedModel(), self.MockedLoss()
             ),
             train_config={"config": "config"},
@@ -30,13 +33,16 @@ class TrainHandlerTest(unittest.TestCase):
         model_save_path.mkdir(exist_ok=True)
         train_handler = TrainHandler(
             max_epochs=5,
-            dataset=self.MockedDataset(),
             train_executor=self.MockedTrainExecutor(
+                self.MockedModel(), self.MockedLoss()
+            ),
+            validation_executor=self.MockedValidationExecutor(
                 self.MockedModel(), self.MockedLoss(), is_improving=True
             ),
             model_save_path=model_save_path,
             train_config={"config": "config"},
             group_name="unittest",
+            validation_frequency=1,
         )
         train_handler.run("unittest_run")
         self.assertTrue((model_save_path / "model_epoch_0.pt").exists())
@@ -57,13 +63,16 @@ class TrainHandlerTest(unittest.TestCase):
         model_save_path.mkdir(exist_ok=True)
         train_handler = TrainHandler(
             max_epochs=5,
-            dataset=self.MockedDataset(),
             train_executor=self.MockedTrainExecutor(
+                self.MockedModel(), self.MockedLoss()
+            ),
+            validation_executor=self.MockedValidationExecutor(
                 self.MockedModel(), self.MockedLoss(), is_improving=False
             ),
             model_save_path=model_save_path,
             train_config={"config": "config"},
             group_name="unittest",
+            validation_frequency=1,
         )
         train_handler.run("unittest_run")
         self.assertTrue((model_save_path / "model_epoch_0.pt").exists())
@@ -82,17 +91,7 @@ class TrainHandlerTest(unittest.TestCase):
             self.fc = nn.Linear(10, 1)
 
         def forward(self, x):
-            return self.fc(x)
-
-    class MockedDataset(torch.utils.data.Dataset):
-        def __len__(self):
-            return 9
-
-        def __getitem__(self, idx):
-            return (
-                torch.tensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),
-                torch.tensor([1.0]),
-            )
+            return self.fc(x[0])
 
     class MockedLoss(_LossFn):
         def __init__(self):
@@ -109,11 +108,40 @@ class TrainHandlerTest(unittest.TestCase):
                 loss=loss,
                 batch_size=3,
                 device="cpu",
+                train_data=MockedDataset(),
             )
-            self.loss = 10.0
+            self.curr_loss = 10.0
             self.is_improving = is_improving
 
-        def train(self, dataset, prepare_input_fn):
+        def train(self):
             if self.is_improving:
-                self.loss -= 1
-            return self.loss
+                self.curr_loss -= 1
+            return self.curr_loss
+
+    class MockedValidationExecutor(ValidationExecutor):
+        def __init__(self, model: nn.Module, loss: _LossFn, is_improving=False):
+            super().__init__(
+                model=model,
+                loss=loss,
+                batch_size=3,
+                device="cpu",
+                val_data=MockedDataset(),
+            )
+            self.curr_loss = 10.0
+            self.is_improving = is_improving
+
+        def validate(self):
+            if self.is_improving:
+                self.curr_loss -= 1
+            return self.curr_loss
+
+
+class MockedDataset(torch.utils.data.Dataset):
+    def __len__(self):
+        return 9
+
+    def __getitem__(self, idx):
+        return (
+            torch.tensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),
+            torch.tensor([1.0]),
+        )

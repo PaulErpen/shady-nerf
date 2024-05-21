@@ -29,10 +29,10 @@ class TrainExecutorTest(unittest.TestCase):
             loss=self.MockedLoss(),
             batch_size=3,
             device="cpu",
+            train_data=self.MockedDataset(),
         )
-        dataset = self.MockedDataset()
 
-        loss = executor.train(dataset, prepare_input_fn=lambda x: x[0])
+        loss = executor.train()
         self.assertIsInstance(loss, float)
 
     def test_given_valid_props_for_model_training__when_executing_a_training_run__no_errors_are_raised(
@@ -45,9 +45,10 @@ class TrainExecutorTest(unittest.TestCase):
             loss=LFLoss(),
             batch_size=3,
             device="cpu",
+            train_data=self.dataset,
         )
 
-        executor.train(self.dataset)
+        executor.train()
 
         self.assertTrue(True)
 
@@ -57,7 +58,7 @@ class TrainExecutorTest(unittest.TestCase):
             self.fc = nn.Linear(10, 1)
 
         def forward(self, x):
-            return self.fc(x)
+            return self.fc(x[0])
 
     class MockedDataset(torch.utils.data.Dataset):
         def __len__(self):

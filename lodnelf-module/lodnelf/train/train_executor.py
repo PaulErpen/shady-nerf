@@ -16,30 +16,26 @@ class TrainExecutor:
         loss: _LossFn,
         batch_size: int,
         device: str,
+        train_data: Dataset,
     ):
         self.model = model
         self.optimizer = optimizer
         self.loss = loss
         self.device = device
         self.batch_size = batch_size
+        self.train_data = train_data
 
-    def train(
-        self,
-        train_data: Dataset,
-        prepare_input_fn: Callable[[Any], Any] | None = None,
-    ):
+    def train(self):
         self.model.train()
 
         train_data_loader = DataLoader(
-            train_data, batch_size=self.batch_size, shuffle=True
+            self.train_data, batch_size=self.batch_size, shuffle=True
         )
 
         total_loss = 0
 
         for batch in tqdm(train_data_loader):
             model_input = batch
-            if prepare_input_fn is not None:
-                model_input = prepare_input_fn(batch)
             model_input = util.to_device(model_input, self.device)
             batch = util.to_device(batch, self.device)
 

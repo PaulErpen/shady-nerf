@@ -18,7 +18,7 @@ class AbstractConfig(ABC):
         pass
 
     @abstractmethod
-    def get_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
+    def get_train_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
         pass
 
     @abstractmethod

@@ -16,7 +16,7 @@ def run_testing(config_name, model_path, data_dir, plot_alpha=False, plot_depth=
     model = config.get_model()
     model.load_state_dict(state_dict)
 
-    dataset = config.get_data_set(data_dir)
+    dataset = config.get_train_data_set(data_dir)
 
     n_rows = 2
 
