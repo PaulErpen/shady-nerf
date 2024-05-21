@@ -11,7 +11,7 @@ from lodnelf.geometry.look_at import look_at
 
 
 class InteractiveDisplay:
-    def __init__(self, config_name: str, model_save_path: str):
+    def __init__(self, config_name: str, model_save_path: str, image_size = 440):
         config_factory = ConfigFactory()
         loaded_config = config_factory.get_by_name(config_name)
 
@@ -22,9 +22,11 @@ class InteractiveDisplay:
         self.model = loaded_config.get_model()
         self.model.load_state_dict(state_dict)
 
+        self.image_size = image_size
+
     def run(self):
         pygame.init()
-        screen = pygame.display.set_mode((128, 128))
+        screen = pygame.display.set_mode((self.image_size, self.image_size))
         pygame.display.set_caption("Interactive Showcase")
 
         # Initial camera to world matrix 4x4 matrix
@@ -78,6 +80,7 @@ class InteractiveDisplay:
                 cam2world_matrix[:3, 3] = new_translation
 
             image = self.update_image(cam2world_matrix)
+            image = image.resize((self.image_size, self.image_size))
             mode = image.mode
             size = image.size
             data = image.tobytes()

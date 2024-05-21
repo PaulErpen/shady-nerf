@@ -61,6 +61,7 @@ class TrainHandler:
                             f"No improvement in the last {no_improvement} epochs. Stopping training."
                         )
                         break
+            logger.commit()
             print(f"Epoch {epoch} finished.")
 
         print("Training finished.")

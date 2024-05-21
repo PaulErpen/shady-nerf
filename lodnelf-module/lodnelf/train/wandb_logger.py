@@ -26,7 +26,10 @@ class WandBLogger:
         return cls(wandb_api_key, run_config, run_name, group_name)
 
     def log(self, metrics, step):
-        wandb.log(metrics, step=step, commit=True)
+        wandb.log(metrics, step=step, commit=False)
+
+    def commit(self):
+        wandb.log({}, commit=True)
 
     def finish(self):
         self.run.finish()
