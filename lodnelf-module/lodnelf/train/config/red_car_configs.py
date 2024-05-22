@@ -8,6 +8,7 @@ from lodnelf.train.train_handler import TrainHandler
 from lodnelf.train.validation_executor import ValidationExecutor
 from lodnelf.train.config.abstract_config import AbstractConfig
 from pathlib import Path
+from lodnelf.model.planar_fourier import PlanarFourier
 
 
 def get_red_car_train_dataset(data_directory: str):
@@ -136,3 +137,22 @@ class SimpleRedCarModelConfigSiren(AbstractSimpleRedCarModelConfig):
         return SimpleLightFieldModel(
             latent_dim=256, depth=False, alpha=False, model_type="siren"
         )
+
+
+class SimpleRedCarModelConfigPlanarFourier(AbstractSimpleRedCarModelConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "PlanarFourier with hidden_dim=256, output_dim=3, fourier_mapping_size=128",
+            "dataset": "cars_train.hdf5",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "SimpleRedCarModelPlanarFourier"
+
+    def get_model(self):
+        return PlanarFourier(hidden_dim=256, output_dim=3, fourier_mapping_size=128)
