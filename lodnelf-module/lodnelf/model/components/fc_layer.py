@@ -9,7 +9,7 @@ class FCLayer(nn.Module):
         in_features: int,
         out_features: int,
         nonlinearity: Literal["relu"] | Literal["leaky_relu"] = "relu",
-        norm: Literal["layernorm"] | Literal["layernorm_na"] | None = "layernorm",
+        norm: Literal["layernorm"] | Literal["layernorm_na"] | None = None,
     ):
         super().__init__()
         self.nets: List[nn.Module] = [nn.Linear(in_features, out_features)]
