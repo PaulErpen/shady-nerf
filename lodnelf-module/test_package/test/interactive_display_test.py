@@ -113,7 +113,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         self,
     ):
         interactive_display = InteractiveDisplay(
-            "SimpleRedCarModelDeepPlucker", "models/experiment_deep_plucker_1/model_epoch_31.pt"
+            "SimpleRedCarModelDeepPlucker", "models/experiment_deep_plucker_7/model_epoch_148.pt"
         )
 
         interactive_display.run()

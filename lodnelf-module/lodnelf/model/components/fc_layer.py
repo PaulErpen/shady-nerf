@@ -10,6 +10,7 @@ class FCLayer(nn.Module):
         out_features: int,
         nonlinearity: Literal["relu"] | Literal["leaky_relu"] = "relu",
         norm: Literal["layernorm"] | Literal["layernorm_na"] | None = None,
+        init_weights: bool = False,
     ):
         super().__init__()
         self.nets: List[nn.Module] = [nn.Linear(in_features, out_features)]
@@ -28,7 +29,9 @@ class FCLayer(nn.Module):
         elif nonlinearity == "leaky_relu":
             self.nets.append(nn.LeakyReLU(0.2, inplace=True))
         self.net = nn.Sequential(*self.nets)
-        self.net.apply(init_weights_normal)
+
+        if init_weights:
+            self.net.apply(init_weights_normal)
 
     def forward(self, input):
         return self.net(input)
