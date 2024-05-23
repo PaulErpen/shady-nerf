@@ -99,3 +99,21 @@ class InteractiveDisplayTest(unittest.TestCase):
         )
 
         interactive_display.run()
+
+    def test_given_a_valid_planar_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "SimpleRedCarModelPlanarFourier", "models/experiment_planar_fourier_5/model_epoch_26.pt"
+        )
+
+        interactive_display.run()
+
+    def test_given_a_valid_deep_plucker_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "SimpleRedCarModelDeepPlucker", "models/experiment_deep_plucker_1/model_epoch_31.pt"
+        )
+
+        interactive_display.run()

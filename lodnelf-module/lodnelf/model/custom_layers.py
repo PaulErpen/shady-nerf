@@ -3,11 +3,8 @@ from collections import OrderedDict
 import torch
 from torch import nn
 import numpy as np
-
-def init_weights_normal(m):
-    if type(m) == nn.Linear:
-        if hasattr(m, "weight"):
-            nn.init.kaiming_normal_(m.weight, a=0.0, nonlinearity="relu", mode="fan_in")
+from lodnelf.model.components.init_weights_normal import init_weights_normal
+from lodnelf.model.components.fc_layer import FCLayer
 
 
 def first_layer_sine_init(m):
@@ -37,31 +34,6 @@ class BatchLinear(nn.Linear):
         if bias is not None:
             output += bias.unsqueeze(-2)
         return output
-
-
-class FCLayer(nn.Module):
-    def __init__(self, in_features, out_features, nonlinearity="relu", norm=None):
-        super().__init__()
-        self.nets: List[nn.Module] = [BatchLinear(in_features, out_features)]
-
-        if norm == "layernorm":
-            self.nets.append(
-                nn.LayerNorm([out_features], elementwise_affine=True),
-            )
-        elif norm == "layernorm_na":
-            self.nets.append(
-                nn.LayerNorm([out_features], elementwise_affine=False),
-            )
-
-        if nonlinearity == "relu":
-            self.nets.append(nn.ReLU(inplace=True))
-        elif nonlinearity == "leaky_relu":
-            self.nets.append(nn.LeakyReLU(0.2, inplace=True))
-        self.net = nn.Sequential(*self.nets)
-        self.net.apply(init_weights_normal)
-
-    def forward(self, input, params=None):
-        return self.net(input)
 
 
 class FCBlock(nn.Module):
@@ -118,8 +90,11 @@ class FCBlock(nn.Module):
     def forward(self, input, params=None):
         return self.net(input)
 
+
 class SineLayer(nn.Module):
-    def __init__(self, in_features, out_features, bias=True, is_first=False, omega_0=30):
+    def __init__(
+        self, in_features, out_features, bias=True, is_first=False, omega_0=30
+    ):
         super().__init__()
         self.omega_0 = float(omega_0)
 
@@ -132,11 +107,12 @@ class SineLayer(nn.Module):
     def init_weights(self):
         with torch.no_grad():
             if self.is_first:
-                self.linear.weight.uniform_(-1 / self.in_features,
-                                            1 / self.in_features)
+                self.linear.weight.uniform_(-1 / self.in_features, 1 / self.in_features)
             else:
-                self.linear.weight.uniform_(-np.sqrt(6 / self.in_features) / self.omega_0,
-                                            np.sqrt(6 / self.in_features) / self.omega_0)
+                self.linear.weight.uniform_(
+                    -np.sqrt(6 / self.in_features) / self.omega_0,
+                    np.sqrt(6 / self.in_features) / self.omega_0,
+                )
 
     def forward_with_film(self, input, gamma, beta):
         intermed = self.linear(input)
@@ -146,31 +122,62 @@ class SineLayer(nn.Module):
         intermed = self.linear(input)
         return torch.sin(self.omega_0 * intermed)
 
+
 class Siren(nn.Module):
-    def __init__(self, in_features, hidden_features, hidden_layers, out_features, outermost_linear=False,
-                 first_omega_0=30, hidden_omega_0=30., special_first=True):
+    def __init__(
+        self,
+        in_features,
+        hidden_features,
+        hidden_layers,
+        out_features,
+        outermost_linear=False,
+        first_omega_0=30,
+        hidden_omega_0=30.0,
+        special_first=True,
+    ):
         super().__init__()
         self.hidden_omega_0 = hidden_omega_0
 
         layer = SineLayer
 
         self.nets = []
-        self.nets.append(layer(in_features, hidden_features,
-                              is_first=special_first, omega_0=first_omega_0))
+        self.nets.append(
+            layer(
+                in_features,
+                hidden_features,
+                is_first=special_first,
+                omega_0=first_omega_0,
+            )
+        )
 
         for i in range(hidden_layers):
-            self.nets.append(layer(hidden_features, hidden_features,
-                                  is_first=False, omega_0=int(hidden_omega_0)))
+            self.nets.append(
+                layer(
+                    hidden_features,
+                    hidden_features,
+                    is_first=False,
+                    omega_0=int(hidden_omega_0),
+                )
+            )
 
         if outermost_linear:
             final_linear = BatchLinear(hidden_features, out_features)
 
             with torch.no_grad():
-                final_linear.weight.uniform_(-np.sqrt(6 / hidden_features) / 30.,
-                                             np.sqrt(6 / hidden_features) / 30.)
+                final_linear.weight.uniform_(
+                    -np.sqrt(6 / hidden_features) / 30.0,
+                    np.sqrt(6 / hidden_features) / 30.0,
+                )
             self.nets.append(final_linear)
         else:
-            self.nets.append(layer(hidden_features, out_features, is_first=False, omega_0=int(hidden_omega_0)))
+            self.nets.append(
+                layer(
+                    hidden_features,
+                    out_features,
+                    is_first=False,
+                    omega_0=int(hidden_omega_0),
+                )
+            )
 
         self.nets = nn.ModuleList(self.nets)
         self.net = nn.Sequential(*self.nets)
@@ -186,7 +193,7 @@ class Siren(nn.Module):
 
         for i, (layer, layer_film) in enumerate(zip(self.nets, film)):
             if i < len(self.nets) - 1:
-                x = layer.forward_with_film(x, layer_film['gamma'], layer_film['beta'])
+                x = layer.forward_with_film(x, layer_film["gamma"], layer_film["beta"])
             else:
                 x = layer.forward(x)
 

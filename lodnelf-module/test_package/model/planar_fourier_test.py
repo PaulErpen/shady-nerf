@@ -17,14 +17,14 @@ class PlanarFourierTest(unittest.TestCase):
     def test_given_valid_parameters__when_instantiating_the_model__then_no_error_is_raised(
         self,
     ):
-        model = PlanarFourier(hidden_dim=256, output_dim=3, fourier_mapping_size=256)
+        model = PlanarFourier(hidden_dims=[256], output_dim=3, fourier_mapping_size=256)
 
         self.assertIsNotNone(model)
 
     def test_given_a_valid_observation__when_forwarding_through_the_model__then_output_is_correct(
         self,
     ):
-        model = PlanarFourier(hidden_dim=256, output_dim=3, fourier_mapping_size=256)
+        model = PlanarFourier(hidden_dims=[256], output_dim=3, fourier_mapping_size=256)
 
         query = self.dataset[0][0]
         model_input = util.add_batch_dim_to_dict(query)

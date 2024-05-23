@@ -9,6 +9,7 @@ from lodnelf.train.validation_executor import ValidationExecutor
 from lodnelf.train.config.abstract_config import AbstractConfig
 from pathlib import Path
 from lodnelf.model.planar_fourier import PlanarFourier
+from lodnelf.model.deep_neural_network import DeepNeuralNetworkPlucker
 
 
 def get_red_car_train_dataset(data_directory: str):
@@ -146,7 +147,7 @@ class SimpleRedCarModelConfigPlanarFourier(AbstractSimpleRedCarModelConfig):
             "loss": "LFLoss",
             "batch_size": str(1),
             "max_epochs": str(150),
-            "model_description": "PlanarFourier with hidden_dim=256, output_dim=3, fourier_mapping_size=128",
+            "model_description": "PlanarFourier with hidden_dims=[256, 256, 256, 256, 256, 256], output_dim=3, fourier_mapping_size=256",
             "dataset": "cars_train.hdf5",
         }
         super().__init__(config)
@@ -155,4 +156,27 @@ class SimpleRedCarModelConfigPlanarFourier(AbstractSimpleRedCarModelConfig):
         return "SimpleRedCarModelPlanarFourier"
 
     def get_model(self):
-        return PlanarFourier(hidden_dim=256, output_dim=3, fourier_mapping_size=128)
+        return PlanarFourier(
+            hidden_dims=[256, 256, 256, 256, 256, 256],
+            output_dim=3,
+            fourier_mapping_size=256,
+        )
+
+
+class SimpleRedCarModelConfigDeepPlucker(AbstractSimpleRedCarModelConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "DeepNeuralNetworkPlucker with latent_dim=[256] * 6",
+            "dataset": "cars_train.hdf5",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "SimpleRedCarModelDeepPlucker"
+
+    def get_model(self):
+        return DeepNeuralNetworkPlucker(hidden_dims=[256] * 6, output_dim=3)

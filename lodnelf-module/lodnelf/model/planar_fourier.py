@@ -1,3 +1,5 @@
+from typing import List
+from lodnelf.model.deep_neural_network import DeepNeuralNetwork
 import torch
 import torch.nn as nn
 import numpy as np
@@ -13,20 +15,26 @@ class FourierFeatures(nn.Module):
 
     def forward(self, x):
         # normalise x as vectors in their last dimension
-        x = x / torch.norm(x, dim=-1, keepdim=True)
         x_proj = 2 * np.pi * x @ self.B
         return torch.cat([torch.sin(x_proj), torch.cos(x_proj)], dim=-1)
 
 
 class PlanarFourier(nn.Module):
     def __init__(
-        self, hidden_dim: int, output_dim: int, fourier_mapping_size: int, scale=10
+        self,
+        hidden_dims: List[int],
+        output_dim: int,
+        fourier_mapping_size: int,
+        scale=10,
     ):
         super(PlanarFourier, self).__init__()
         self.fourier_features = FourierFeatures(3, fourier_mapping_size, scale=scale)
-        self.fc1 = nn.Linear(6 + fourier_mapping_size * 2, hidden_dim)
-        self.act1 = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_dim, output_dim)
+
+        self.deep_neural_network = DeepNeuralNetwork(
+            input_dim=6 + fourier_mapping_size * 2,
+            hidden_dims=hidden_dims,
+            output_dim=output_dim,
+        )
 
     def forward(self, input):
         out_dict = {}
@@ -42,9 +50,7 @@ class PlanarFourier(nn.Module):
         x = torch.cat([plucker_embeddings, fourier_features], dim=-1)
 
         # network
-        x = self.fc1(x)
-        x = self.act1(x)
-        x = self.fc2(x)
+        x = self.deep_neural_network(x)
 
         out_dict["rgb"] = x
 
