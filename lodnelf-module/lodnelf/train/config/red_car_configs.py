@@ -11,7 +11,7 @@ from pathlib import Path
 from lodnelf.model.planar_fourier import PlanarFourier
 from lodnelf.model.deep_neural_network import DeepNeuralNetworkPlucker
 import random
-
+from lodnelf.model.my_siren import MySiren
 
 def get_red_car_dataset(data_directory: str, idx: List[int] | None = None):
     return get_instance_datasets_hdf5(
@@ -193,3 +193,21 @@ class SimpleRedCarModelConfigDeepPlucker6(AbstractSimpleRedCarModelConfig):
 
     def get_model(self):
         return DeepNeuralNetworkPlucker(hidden_dims=[256] * 6, output_dim=3)
+    
+class SimpleRedCarModelMySiren(AbstractSimpleRedCarModelConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "MySiren",
+            "dataset": "cars_train.hdf5",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "SimpleRedCarModelMySiren"
+
+    def get_model(self):
+        return MySiren()
