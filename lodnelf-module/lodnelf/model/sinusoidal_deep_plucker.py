@@ -4,17 +4,6 @@ from lodnelf.geometry import geometry
 import torch
 import numpy as np
 
-class FourierFeatures(nn.Module):
-    def __init__(self, input_dim, mapping_size, scale=10):
-        super(FourierFeatures, self).__init__()
-        self.B = nn.Parameter(
-            scale * torch.randn((input_dim, mapping_size)), requires_grad=False
-        )
-
-    def forward(self, x):
-        x_proj = 2 * np.pi * x @ self.B
-        return torch.cat([torch.sin(x_proj), torch.cos(x_proj)], dim=-1)
-
 class SinusoidalDeepPlucker(nn.Module):
     def __init__(self):
         super(SinusoidalDeepPlucker, self).__init__()

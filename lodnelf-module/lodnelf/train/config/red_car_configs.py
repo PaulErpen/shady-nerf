@@ -14,6 +14,7 @@ import random
 from lodnelf.model.my_siren import MySiren
 from lodnelf.model.sinusoidal_deep_plucker import SinusoidalDeepPlucker
 
+
 def get_red_car_dataset(data_directory: str, idx: List[int] | None = None):
     return get_instance_datasets_hdf5(
         root=f"{data_directory}/hdf5/cars_train.hdf5",
@@ -142,7 +143,7 @@ class SimpleRedCarModelConfigPlanarFourier(AbstractSimpleRedCarModelConfig):
             "loss": "LFLoss",
             "batch_size": str(1),
             "max_epochs": str(150),
-            "model_description": "PlanarFourier with hidden_dims=[256, 256, 256, 256, 256, 256], output_dim=3, fourier_mapping_size=256",
+            "model_description": "PlanarFourier with hidden_dims=[256, 256, 256], output_dim=3, fourier_mapping_size=32",
             "dataset": "cars_train.hdf5",
         }
         super().__init__(config)
@@ -152,9 +153,9 @@ class SimpleRedCarModelConfigPlanarFourier(AbstractSimpleRedCarModelConfig):
 
     def get_model(self):
         return PlanarFourier(
-            hidden_dims=[256, 256, 256, 256, 256, 256],
+            hidden_dims=[256, 256, 256],
             output_dim=3,
-            fourier_mapping_size=256,
+            fourier_mapping_size=32,
         )
 
 
@@ -194,7 +195,8 @@ class SimpleRedCarModelConfigDeepPlucker6(AbstractSimpleRedCarModelConfig):
 
     def get_model(self):
         return DeepNeuralNetworkPlucker(hidden_dims=[256] * 6, output_dim=3)
-    
+
+
 class SimpleRedCarModelMySiren(AbstractSimpleRedCarModelConfig):
     def __init__(self):
         config: Dict[str, str] = {
@@ -212,6 +214,7 @@ class SimpleRedCarModelMySiren(AbstractSimpleRedCarModelConfig):
 
     def get_model(self):
         return MySiren()
+
 
 class SimpleRedCarModelConfigSinusoidalDeepPlucker(AbstractSimpleRedCarModelConfig):
     def __init__(self):

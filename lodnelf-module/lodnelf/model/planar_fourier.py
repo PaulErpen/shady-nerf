@@ -2,21 +2,8 @@ from typing import List
 from lodnelf.model.deep_neural_network import DeepNeuralNetwork
 import torch
 import torch.nn as nn
-import numpy as np
 from lodnelf.geometry import geometry
-
-
-class FourierFeatures(nn.Module):
-    def __init__(self, input_dim, mapping_size, scale=10):
-        super(FourierFeatures, self).__init__()
-        self.B = nn.Parameter(
-            scale * torch.randn((input_dim, mapping_size)), requires_grad=False
-        )
-
-    def forward(self, x):
-        # normalise x as vectors in their last dimension
-        x_proj = 2 * np.pi * x @ self.B
-        return torch.cat([torch.sin(x_proj), torch.cos(x_proj)], dim=-1)
+from lodnelf.model.components.fourier_features import FourierFeatures
 
 
 class PlanarFourier(nn.Module):
@@ -25,13 +12,12 @@ class PlanarFourier(nn.Module):
         hidden_dims: List[int],
         output_dim: int,
         fourier_mapping_size: int,
-        scale=10,
     ):
         super(PlanarFourier, self).__init__()
-        self.fourier_features = FourierFeatures(3, fourier_mapping_size, scale=scale)
+        self.fourier_features = FourierFeatures(fourier_mapping_size)
 
         self.deep_neural_network = DeepNeuralNetwork(
-            input_dim=6 + fourier_mapping_size * 2,
+            input_dim=3 + fourier_mapping_size * 2 * 3,
             hidden_dims=hidden_dims,
             output_dim=output_dim,
         )
@@ -44,10 +30,12 @@ class PlanarFourier(nn.Module):
         plucker_embeddings = geometry.plucker_embedding(
             input["cam2world"], input["uv"], input["intrinsics"]
         )
-        plucker_embeddings.requires_grad_(True)
         plucker_embeddings = plucker_embeddings.view(b, n_qry, 6)
-        fourier_features = self.fourier_features(plucker_embeddings[:, :, 3:])
-        x = torch.cat([plucker_embeddings, fourier_features], dim=-1)
+        fourier_features = self.fourier_features(plucker_embeddings[:, :, :3]) * 30.0
+        x = torch.cat([fourier_features, plucker_embeddings[:, :, 3:]], dim=-1)
+
+        x.requires_grad_(True)
+
 
         # network
         x = self.deep_neural_network(x)
