@@ -5,10 +5,8 @@ from lodnelf.train.train_executor import TrainExecutor
 import torch.utils
 import torch.utils.data
 from lodnelf.data.hdf5dataset import get_instance_datasets_hdf5
-from lodnelf.model.simple_light_field_model import SimpleLightFieldModel
-from lodnelf.util import util
 from lodnelf.train.loss import LFLoss, _LossFn
-
+from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 
 class TrainExecutorTest(unittest.TestCase):
     def setUp(self):
@@ -38,7 +36,10 @@ class TrainExecutorTest(unittest.TestCase):
     def test_given_valid_props_for_model_training__when_executing_a_training_run__no_errors_are_raised(
         self,
     ):
-        simple_model = SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
+        simple_model = DeepNeuralNetworkPlucker(
+            hidden_dims=[20, 30],
+            output_dim=3,
+        )
         executor = TrainExecutor(
             model=simple_model,
             optimizer=torch.optim.Adam(self.MockedModel().parameters()),

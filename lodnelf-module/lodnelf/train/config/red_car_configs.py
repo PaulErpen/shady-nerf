@@ -1,6 +1,5 @@
 from typing import Dict, List
 from lodnelf.data.hdf5dataset import get_instance_datasets_hdf5
-from lodnelf.model.simple_light_field_model import SimpleLightFieldModel
 from lodnelf.train.train_executor import TrainExecutor
 import torch.optim
 from lodnelf.train.loss import LFLoss
@@ -8,11 +7,9 @@ from lodnelf.train.train_handler import TrainHandler
 from lodnelf.train.validation_executor import ValidationExecutor
 from lodnelf.train.config.abstract_config import AbstractConfig
 from pathlib import Path
-from lodnelf.model.planar_fourier import PlanarFourier
-from lodnelf.model.deep_neural_network import DeepNeuralNetworkPlucker
+from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 import random
-from lodnelf.model.my_siren import MySiren
-from lodnelf.model.sinusoidal_deep_plucker import SinusoidalDeepPlucker
+from lodnelf.model.siren_plucker import SirenPlucker
 
 
 def get_red_car_dataset(data_directory: str, idx: List[int] | None = None):
@@ -29,7 +26,7 @@ class AbstractSimpleRedCarModelConfig(AbstractConfig):
     def __init__(self, config: Dict[str, str]):
         super().__init__(config)
         # random sample of indices from 0-50 without replacement
-        self.train_idx = random.sample(range(50), 44)
+        self.train_idx = random.sample(range(50), 47)
         self.val_idx = [i for i in range(50) if i not in self.train_idx]
 
     def get_train_data_set(self, data_directory: str):
@@ -77,88 +74,6 @@ class AbstractSimpleRedCarModelConfig(AbstractConfig):
         train_handler.run(run_name)
 
 
-class SimpleRedCarModelConfigDepthAlpha(AbstractSimpleRedCarModelConfig):
-    def __init__(self):
-        config: Dict[str, str] = {
-            "optimizer": "AdamW (lr 1e-4)",
-            "loss": "LFLoss",
-            "batch_size": str(1),
-            "max_epochs": str(150),
-            "model_description": "SimpleLightFieldModel with latent_dim=256, depth=True, alpha=True",
-            "dataset": "cars_train.hdf5",
-        }
-        super().__init__(config)
-
-    def get_name(self) -> str:
-        return "SimpleRedCarModelDepthAlpha"
-
-    def get_model(self):
-        return SimpleLightFieldModel(latent_dim=256, depth=True, alpha=True)
-
-
-class SimpleRedCarModelConfig(AbstractSimpleRedCarModelConfig):
-    def __init__(self):
-        config: Dict[str, str] = {
-            "optimizer": "AdamW (lr 1e-4)",
-            "loss": "LFLoss",
-            "batch_size": str(1),
-            "max_epochs": str(150),
-            "model_description": "SimpleLightFieldModel with latent_dim=256, depth=False, alpha=False",
-            "dataset": "cars_train.hdf5",
-        }
-        super().__init__(config)
-
-    def get_name(self) -> str:
-        return "SimpleRedCarModel"
-
-    def get_model(self):
-        return SimpleLightFieldModel(latent_dim=256, depth=False, alpha=False)
-
-
-class SimpleRedCarModelConfigSiren(AbstractSimpleRedCarModelConfig):
-    def __init__(self):
-        config: Dict[str, str] = {
-            "optimizer": "AdamW (lr 1e-4)",
-            "loss": "LFLoss",
-            "batch_size": str(1),
-            "max_epochs": str(150),
-            "model_description": "SimpleLightFieldModel (Siren) with latent_dim=256, depth=False, alpha=False",
-            "dataset": "cars_train.hdf5",
-        }
-        super().__init__(config)
-
-    def get_name(self) -> str:
-        return "SimpleRedCarModelSiren"
-
-    def get_model(self):
-        return SimpleLightFieldModel(
-            latent_dim=256, depth=False, alpha=False, model_type="siren"
-        )
-
-
-class SimpleRedCarModelConfigPlanarFourier(AbstractSimpleRedCarModelConfig):
-    def __init__(self):
-        config: Dict[str, str] = {
-            "optimizer": "AdamW (lr 1e-4)",
-            "loss": "LFLoss",
-            "batch_size": str(1),
-            "max_epochs": str(150),
-            "model_description": "PlanarFourier with hidden_dims=[256, 256, 256], output_dim=3, fourier_mapping_size=32",
-            "dataset": "cars_train.hdf5",
-        }
-        super().__init__(config)
-
-    def get_name(self) -> str:
-        return "SimpleRedCarModelPlanarFourier"
-
-    def get_model(self):
-        return PlanarFourier(
-            hidden_dims=[256, 256, 256],
-            output_dim=3,
-            fourier_mapping_size=32,
-        )
-
-
 class SimpleRedCarModelConfigDeepPlucker(AbstractSimpleRedCarModelConfig):
     def __init__(self):
         config: Dict[str, str] = {
@@ -204,32 +119,15 @@ class SimpleRedCarModelMySiren(AbstractSimpleRedCarModelConfig):
             "loss": "LFLoss",
             "batch_size": str(1),
             "max_epochs": str(150),
-            "model_description": "MySiren",
+            "model_description": "SirenPlucker with hidden_dims=[256] * 6",
             "dataset": "cars_train.hdf5",
         }
         super().__init__(config)
 
     def get_name(self) -> str:
-        return "SimpleRedCarModelMySiren"
+        return "SimpleRedCarModelSirenPlucker"
 
     def get_model(self):
-        return MySiren()
-
-
-class SimpleRedCarModelConfigSinusoidalDeepPlucker(AbstractSimpleRedCarModelConfig):
-    def __init__(self):
-        config: Dict[str, str] = {
-            "optimizer": "AdamW (lr 1e-4)",
-            "loss": "LFLoss",
-            "batch_size": str(1),
-            "max_epochs": str(150),
-            "model_description": "SinusoidalDeepPlucker",
-            "dataset": "cars_train.hdf5",
-        }
-        super().__init__(config)
-
-    def get_name(self) -> str:
-        return "SimpleRedCarModelSinusoidalDeepPlucker"
-
-    def get_model(self):
-        return SinusoidalDeepPlucker()
+        return SirenPlucker(
+            hidden_dims=[256] * 6,
+        )

@@ -1,11 +1,12 @@
-import torch.nn as nn
+from typing import List
+from torch import nn
+from lodnelf.model.components.sine_layer import SineLayer
 from lodnelf.geometry import geometry
-from lodnelf.model.components.fc_layer import FCLayer
 
 
-class DeepNeuralNetwork(nn.Module):
-    def __init__(self, input_dim, hidden_dims, output_dim):
-        super(DeepNeuralNetwork, self).__init__()
+class SirenPlucker(nn.Module):
+    def __init__(self, hidden_dims: List[int]):
+        super(SirenPlucker, self).__init__()
 
         # Ensure hidden_dims is a list of dimensions
         if isinstance(hidden_dims, int):
@@ -15,26 +16,17 @@ class DeepNeuralNetwork(nn.Module):
         layers = []
 
         # Add the input layer
-        layers.append(FCLayer(input_dim, hidden_dims[0]))
+        layers.append(SineLayer(6, hidden_dims[0], is_first=True))
 
         # Add the hidden layers
         for i in range(1, len(hidden_dims)):
-            layers.append(FCLayer(hidden_dims[i - 1], hidden_dims[i]))
+            layers.append(SineLayer(hidden_dims[i - 1], hidden_dims[i]))
 
         # Add the output layer
-        layers.append(FCLayer(hidden_dims[-1], output_dim))
+        layers.append(SineLayer(hidden_dims[-1], 3))
 
         # Create the model
-        self.model = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return self.model(x)
-
-
-class DeepNeuralNetworkPlucker(nn.Module):
-    def __init__(self, hidden_dims, output_dim):
-        super(DeepNeuralNetworkPlucker, self).__init__()
-        self.deep_neural_network = DeepNeuralNetwork(6, hidden_dims, output_dim)
+        self.siren = nn.Sequential(*layers)
 
     def forward(self, input):
         out_dict = {}
@@ -48,8 +40,7 @@ class DeepNeuralNetworkPlucker(nn.Module):
         plucker_embeddings = plucker_embeddings.view(b, n_qry, 6)
 
         # network
-        x = self.deep_neural_network(plucker_embeddings)
+        x = self.siren(plucker_embeddings)
 
         out_dict["rgb"] = x
-
         return out_dict

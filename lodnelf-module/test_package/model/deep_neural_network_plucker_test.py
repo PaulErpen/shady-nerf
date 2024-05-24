@@ -1,14 +1,12 @@
 import unittest
-import torch
-from lodnelf.model.deep_neural_network import (
-    DeepNeuralNetwork,
+from lodnelf.model.deep_neural_network_plucker import (
     DeepNeuralNetworkPlucker,
 )
 from lodnelf.data.hdf5dataset import get_instance_datasets_hdf5
 from lodnelf.util import util
 
 
-class DeepNeuralNetworkTest(unittest.TestCase):
+class DeepNeuralNetworkPluckerTest(unittest.TestCase):
     def setUp(self):
         self.dataset = get_instance_datasets_hdf5(
             root="data/hdf5/cars_train.hdf5",
@@ -17,30 +15,6 @@ class DeepNeuralNetworkTest(unittest.TestCase):
             sidelen=128,
             max_observations_per_instance=1,
         )
-
-    def test_given_valid_parameters__when_instantiating_the_model__then_no_error_is_raised(
-        self,
-    ):
-        model = DeepNeuralNetwork(
-            input_dim=10,
-            hidden_dims=[20, 30],
-            output_dim=1,
-        )
-
-    def test_given_a_valid_batch_of_queries__when_forwarding__then_the_output_has_the_correct_shape(
-        self,
-    ):
-        model = DeepNeuralNetwork(
-            input_dim=128,
-            hidden_dims=[20, 30],
-            output_dim=6,
-        )
-
-        x = torch.randn(4, 128 * 128, 128)
-
-        output = model(x)
-
-        self.assertEqual(output.shape, (4, 128 * 128, 6))
 
     def test_given_a_valid_batch_of_queries_and_a_plucker_deep_network__when_forwarding__then_the_output_has_the_correct_shape(
         self,

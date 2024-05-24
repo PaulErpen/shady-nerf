@@ -9,13 +9,17 @@ class InteractiveDisplayTest(unittest.TestCase):
     def test_given_a_valid_config_and_model_path__when_initializing_the_interactive_display__then_nothing_is_raised(
         self,
     ):
-        InteractiveDisplay("SimpleRedCarModel", "models/experiment_5/model_epoch_53.pt")
+        InteractiveDisplay(
+            "SimpleRedCarModelDeepPlucker",
+            "models/experiment_deep_plucker_7/model_epoch_148.pt",
+        )
 
     def test_given_a_valid_config_and_model_path__when_generating_a_new_image__then_nothing_is_raised(
         self,
     ):
         interactive_display = InteractiveDisplay(
-            "SimpleRedCarModel", "models/experiment_5/model_epoch_53.pt"
+            "SimpleRedCarModelDeepPlucker",
+            "models/experiment_deep_plucker_7/model_epoch_148.pt",
         )
         cam2world_matrix = np.eye(4)  # Initial camera to world matrix (identity matrix)
 
@@ -25,7 +29,8 @@ class InteractiveDisplayTest(unittest.TestCase):
         self,
     ):
         interactive_display = InteractiveDisplay(
-            "SimpleRedCarModel", "models/experiment_5/model_epoch_53.pt"
+            "SimpleRedCarModelDeepPlucker",
+            "models/experiment_deep_plucker_7/model_epoch_148.pt",
         )
         cam2world_matrix = np.array(
             [
@@ -42,7 +47,8 @@ class InteractiveDisplayTest(unittest.TestCase):
         self,
     ):
         interactive_display = InteractiveDisplay(
-            "SimpleRedCarModel", "models/experiment_5/model_epoch_53.pt"
+            "SimpleRedCarModelDeepPlucker",
+            "models/experiment_deep_plucker_7/model_epoch_148.pt",
         )
         cam2world_matrix = np.eye(4)  # Initial camera to world matrix (identity matrix)
         rotated = np.matmul(
@@ -56,7 +62,8 @@ class InteractiveDisplayTest(unittest.TestCase):
         self,
     ):
         interactive_display = InteractiveDisplay(
-            "SimpleRedCarModel", "models/experiment_5/model_epoch_53.pt"
+            "SimpleRedCarModelDeepPlucker",
+            "models/experiment_deep_plucker_7/model_epoch_148.pt",
         )
         cam2world_matrix = torch.tensor(
             [
@@ -73,57 +80,12 @@ class InteractiveDisplayTest(unittest.TestCase):
 
         interactive_display.update_image(cam2world_matrix).show()
 
-    def test_given_a_valid_config_and_model_path__when_running__then_run_the_application(
-        self,
-    ):
-        interactive_display = InteractiveDisplay(
-            "SimpleRedCarModel", "models/experiment_5/model_epoch_53.pt"
-        )
-
-        interactive_display.run()
-
-    def test_given_a_valid_siren_config_and_model_path__when_running__then_run_the_application(
-        self,
-    ):
-        interactive_display = InteractiveDisplay(
-            "SimpleRedCarModelSiren", "models/experiment_siren/model_epoch_110.pt"
-        )
-
-        interactive_display.run()
-    
-    def test_given_a_valid_siren_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
-        self,
-    ):
-        interactive_display = InteractiveDisplay(
-            "SimpleRedCarModelSiren", "models/experiment_siren_with_val_2/model_epoch_23.pt"
-        )
-
-        interactive_display.run()
-
-    def test_given_a_valid_planar_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
-        self,
-    ):
-        interactive_display = InteractiveDisplay(
-            "SimpleRedCarModelPlanarFourier", "models/experiment_planar_fourier_5/model_epoch_26.pt"
-        )
-
-        interactive_display.run()
-
     def test_given_a_valid_deep_plucker_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
         self,
     ):
         interactive_display = InteractiveDisplay(
-            "SimpleRedCarModelDeepPlucker", "models/experiment_deep_plucker_7/model_epoch_148.pt"
-        )
-
-        interactive_display.run()
-
-
-    def test_given_a_valid_my_siren_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
-        self,
-    ):
-        interactive_display = InteractiveDisplay(
-            "SimpleRedCarModelMySiren", "models/experiment_my_siren_1/model_epoch_11.pt"
+            "SimpleRedCarModelDeepPlucker",
+            "models/experiment_deep_plucker_7/model_epoch_148.pt",
         )
 
         interactive_display.run()
