@@ -117,3 +117,13 @@ class InteractiveDisplayTest(unittest.TestCase):
         )
 
         interactive_display.run()
+
+
+    def test_given_a_valid_my_siren_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "SimpleRedCarModelMySiren", "models/experiment_my_siren_1/model_epoch_11.pt"
+        )
+
+        interactive_display.run()

@@ -8,6 +8,7 @@ from lodnelf.train.config.red_car_configs import (
     SimpleRedCarModelConfigDeepPlucker,
     SimpleRedCarModelConfigDeepPlucker6,
     SimpleRedCarModelMySiren,
+    SimpleRedCarModelConfigSinusoidalDeepPlucker,
 )
 from lodnelf.train.config.abstract_config import AbstractConfig
 
@@ -38,6 +39,11 @@ class ConfigFactory:
 
         red_car_my_siren = SimpleRedCarModelMySiren()
         self.configs[red_car_my_siren.get_name()] = red_car_my_siren
+
+        red_car_sinusoidal_deep_plucker = SimpleRedCarModelConfigSinusoidalDeepPlucker()
+        self.configs[red_car_sinusoidal_deep_plucker.get_name()] = (
+            red_car_sinusoidal_deep_plucker
+        )
 
     def get_by_name(self, name: str) -> AbstractConfig:
         if name not in self.configs:
