@@ -21,11 +21,11 @@ class DeepNeuralNetworkPluckerTest(unittest.TestCase):
     ):
         model = DeepNeuralNetworkPlucker(
             hidden_dims=[20, 30],
-            output_dim=6,
+            mode="rgb",
         )
 
         model_input = util.add_batch_dim_to_dict(self.dataset[0][0])
 
         output = model(model_input)
 
-        self.assertEqual(output["rgb"].shape, (1, 128 * 128, 6))
+        self.assertEqual(output.shape, (1, 128 * 128, 3))

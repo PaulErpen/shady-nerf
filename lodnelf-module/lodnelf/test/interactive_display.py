@@ -108,7 +108,7 @@ class InteractiveDisplay:
             }
         )
         model_output = self.model(model_input)
-        rgb = model_output["rgb"]
+        rgb = model_output
         rgb = rgb.view(128, 128, 3).detach().cpu().numpy()
         rgb = np.clip(rgb, 0, 1)
         return Image.fromarray((rgb * 255).astype(np.uint8))

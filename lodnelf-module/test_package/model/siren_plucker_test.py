@@ -31,4 +31,4 @@ class SirenPluckerTest(unittest.TestCase):
         output = model(model_input)
 
         self.assertIsNotNone(output)
-        self.assertEqual(output["rgb"].shape, (1, 128 * 128, 3))
+        self.assertEqual(output.shape, (1, 128 * 128, 3))

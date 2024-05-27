@@ -8,6 +8,7 @@ from lodnelf.data.hdf5dataset import get_instance_datasets_hdf5
 from lodnelf.train.loss import LFLoss, _LossFn
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 
+
 class TrainExecutorTest(unittest.TestCase):
     def setUp(self):
         self.dataset = get_instance_datasets_hdf5(
@@ -38,7 +39,6 @@ class TrainExecutorTest(unittest.TestCase):
     ):
         simple_model = DeepNeuralNetworkPlucker(
             hidden_dims=[20, 30],
-            output_dim=3,
         )
         executor = TrainExecutor(
             model=simple_model,

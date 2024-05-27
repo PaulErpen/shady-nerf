@@ -90,7 +90,7 @@ class SimpleRedCarModelConfigDeepPlucker(AbstractSimpleRedCarModelConfig):
         return "SimpleRedCarModelDeepPlucker"
 
     def get_model(self):
-        return DeepNeuralNetworkPlucker(hidden_dims=[128] * 3, output_dim=3)
+        return DeepNeuralNetworkPlucker(hidden_dims=[128] * 3)
 
 
 class SimpleRedCarModelConfigDeepPlucker6(AbstractSimpleRedCarModelConfig):
@@ -109,7 +109,7 @@ class SimpleRedCarModelConfigDeepPlucker6(AbstractSimpleRedCarModelConfig):
         return "SimpleRedCarModelDeepPlucker6"
 
     def get_model(self):
-        return DeepNeuralNetworkPlucker(hidden_dims=[256] * 6, output_dim=3)
+        return DeepNeuralNetworkPlucker(hidden_dims=[256] * 6)
 
 
 class SimpleRedCarModelMySiren(AbstractSimpleRedCarModelConfig):
