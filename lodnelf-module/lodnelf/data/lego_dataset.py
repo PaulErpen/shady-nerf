@@ -23,16 +23,26 @@ class LegoDataset(torch.utils.data.Dataset):
         with open(meta_path, "r") as fp:
             self.meta = json.load(fp)
 
+        tmp_img = []
+        for frame in self.meta["frames"]:
+            img_path = self.data_root / Path(frame["file_path"] + ".png")
+            # Load the image
+            img = (
+                torch.tensor((imageio.imread(img_path) / 255.0).astype(np.float32))
+                .view(800 * 800, 4)
+                .float()
+            )
+            tmp_img.append(img)
+        self.images = torch.stack(tmp_img, dim=0)
+
     def __len__(self):
         return len(self.meta["frames"])
 
     def __getitem__(self, idx):
-        img_path = self.data_root / Path(self.meta["frames"][idx]["file_path"] + ".png")
-        # Load the image
-        img = (imageio.imread(img_path) / 255.0).astype(np.float32)
+
         # Load the camera to world matrix
         cam2world = torch.Tensor(self.meta["frames"][idx]["transform_matrix"])
-        H, W = img.shape[:2]
+        H, W = (800, 800)
         # Load the uv coordinates
         uv = generate_uv_coordinates((H, W))
         camera_angle_x = float(self.meta["camera_angle_x"])
@@ -40,7 +50,7 @@ class LegoDataset(torch.utils.data.Dataset):
         intrinsics = np.eye(4)
         intrinsics[0, 0] = intrinsics[1, 1] = focal
         return {
-            "rgba": torch.from_numpy(img).view(800 * 800, 4).float(),
+            "rgba": self.images[idx],
             "cam2world": cam2world.float(),
             "uv": torch.from_numpy(uv).float(),
             "intrinsics": torch.from_numpy(intrinsics).float(),

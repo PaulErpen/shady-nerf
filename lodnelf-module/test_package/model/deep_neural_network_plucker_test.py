@@ -8,15 +8,16 @@ from lodnelf.util import util
 
 
 class DeepNeuralNetworkPluckerTest(unittest.TestCase):
-    def setUp(self):
-        self.dataset = get_instance_datasets_hdf5(
+    @classmethod
+    def setUpClass(cls):
+        cls.dataset = get_instance_datasets_hdf5(
             root="data/hdf5/cars_train.hdf5",
             max_num_instances=1,
             specific_observation_idcs=[0],
             sidelen=128,
             max_observations_per_instance=1,
         )
-        self.lego = LegoDataset(data_root="data/lego", split="train")
+        cls.lego = LegoDataset(data_root="data/lego", split="train")
 
     def test_given_a_valid_batch_of_queries_and_a_plucker_deep_network__when_forwarding__then_the_output_has_the_correct_shape(
         self,

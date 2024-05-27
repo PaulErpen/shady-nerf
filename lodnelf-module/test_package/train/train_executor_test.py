@@ -10,8 +10,9 @@ from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 
 
 class TrainExecutorTest(unittest.TestCase):
-    def setUp(self):
-        self.dataset = get_instance_datasets_hdf5(
+    @classmethod
+    def setUpClass(cls):
+        cls.dataset = get_instance_datasets_hdf5(
             root="data/hdf5/cars_train.hdf5",
             max_num_instances=1,
             specific_observation_idcs=None,
