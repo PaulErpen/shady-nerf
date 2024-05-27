@@ -89,3 +89,23 @@ class InteractiveDisplayTest(unittest.TestCase):
         )
 
         interactive_display.run()
+
+    def test_given_a_valid_sinusoid_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "SimpleRedCarModelSirenPlucker",
+            "models/new_sinusoid_1/model_epoch_31.pt",
+        )
+
+        interactive_display.run()
+
+    def test_given_a_valid_deep_plucker_6_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "SimpleRedCarModelDeepPlucker6",
+            "models/new_plucker_1/model_epoch_63.pt",
+        )
+
+        interactive_display.run()
