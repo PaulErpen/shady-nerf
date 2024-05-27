@@ -24,12 +24,10 @@ class LegoDataset(torch.utils.data.Dataset):
             self.meta = json.load(fp)
 
     def __len__(self):
-        len(self.meta["frames"])
+        return len(self.meta["frames"])
 
     def __getitem__(self, idx):
-        img_path = self.data_root / Path(
-            self.meta["frames"][idx]["file_path"] + ".png"
-        )
+        img_path = self.data_root / Path(self.meta["frames"][idx]["file_path"] + ".png")
         # Load the image
         img = (imageio.imread(img_path) / 255.0).astype(np.float32)
         # Load the camera to world matrix
@@ -41,4 +39,9 @@ class LegoDataset(torch.utils.data.Dataset):
         focal = 0.5 * W / np.tan(0.5 * camera_angle_x)
         intrinsics = np.eye(4)
         intrinsics[0, 0] = intrinsics[1, 1] = focal
-        return {"rgba": img, "cam2world": cam2world, "uv": uv, "intrinsics": intrinsics}
+        return {
+            "rgba": torch.from_numpy(img).view(800 * 800, 4).float(),
+            "cam2world": cam2world.float(),
+            "uv": torch.from_numpy(uv).float(),
+            "intrinsics": torch.from_numpy(intrinsics).float(),
+        }

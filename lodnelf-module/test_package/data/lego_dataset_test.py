@@ -12,7 +12,7 @@ class LegoDatasetTest(unittest.TestCase):
         self,
     ):
         dataset = LegoDataset(data_root="data/lego", split="train")
-        self.assertGreater(len(dataset.meta), 0)
+        self.assertEqual(len(dataset), 100)
 
     def test_given_a_valid_data_root__when_loading_a_single_observation__then_it_must_return_a_dictionary_with_the_correct_keys(
         self,
@@ -29,7 +29,7 @@ class LegoDatasetTest(unittest.TestCase):
     ):
         dataset = LegoDataset(data_root="data/lego", split="train")
         sample = dataset[0]
-        self.assertEqual((800, 800, 4), sample["rgba"].shape)
+        self.assertEqual((800 * 800, 4), sample["rgba"].shape)
 
     def test_given_a_valid_data_root__when_loading_a_single_observation__then_the_cam2world_matrix_should_have_the_correct_shape(
         self,
