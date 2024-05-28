@@ -77,7 +77,7 @@ class InteractiveDisplay:
             data = image.tobytes()
 
             pygame_image = pygame.image.fromstring(data, size, mode)
-            screen.fill((0, 0, 0))
+            screen.fill((255, 255, 255))
             screen.blit(pygame_image, (0, 0))
             pygame.display.flip()
 
