@@ -11,7 +11,7 @@ from lodnelf.geometry.look_at import look_at
 
 
 class InteractiveDisplay:
-    def __init__(self, config_name: str, model_save_path: str, image_size = 440):
+    def __init__(self, config_name: str, model_save_path: str, image_size=440):
         config_factory = ConfigFactory()
         loaded_config = config_factory.get_by_name(config_name)
 
@@ -75,7 +75,7 @@ class InteractiveDisplay:
                 # )
                 cam2world_matrix[:3, :3] = np.matmul(
                     current_rotation_matrix,
-                    cam2world_matrix[:3, :3], 
+                    cam2world_matrix[:3, :3],
                 )
                 cam2world_matrix[:3, 3] = new_translation
 

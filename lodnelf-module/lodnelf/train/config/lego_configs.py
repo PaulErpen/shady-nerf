@@ -18,7 +18,7 @@ class DeepPluckerLegoThreeConfig(AbstractConfig):
             "batch_size": str(1),
             "max_epochs": str(150),
             "model_description": "DeepPlucker with hidden_dims=[256] * 3",
-            "dataset": "cars_train.hdf5",
+            "dataset": "lego rescaled to 128x128",
         }
         super().__init__(config)
 
@@ -32,10 +32,12 @@ class DeepPluckerLegoThreeConfig(AbstractConfig):
         )
 
     def get_train_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
-        return LegoDataset(data_root=data_directory, split="train")
+        return LegoDataset(
+            data_root=data_directory, split="train", image_size=(128, 128)
+        )
 
     def get_val_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
-        return LegoDataset(data_root=data_directory, split="val")
+        return LegoDataset(data_root=data_directory, split="val", image_size=(128, 128))
 
     def run(
         self, run_name: str, model_save_path: Path, data_directory: str, device: str

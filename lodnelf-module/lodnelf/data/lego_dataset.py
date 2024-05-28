@@ -1,17 +1,24 @@
-from typing import Literal
+from typing import Literal, Tuple
 import imageio
 from lodnelf.geometry.generate_uv_coordinates import generate_uv_coordinates
 import torch.utils.data
 import json
 from pathlib import Path
 import numpy as np
+import PIL.Image
 
 
 class LegoDataset(torch.utils.data.Dataset):
-    def __init__(self, data_root: str, split: Literal["train", "val", "test"]):
+    def __init__(
+        self,
+        data_root: str,
+        split: Literal["train", "val", "test"],
+        image_size: Tuple[int, int] = (800, 800),
+    ):
         self.meta = {}
         self.split = split
         self.data_root = Path(data_root)
+        self.image_size = image_size
 
         meta_path = Path(data_root) / Path("transforms_{}.json".format(self.split))
 
@@ -27,9 +34,12 @@ class LegoDataset(torch.utils.data.Dataset):
         for frame in self.meta["frames"]:
             img_path = self.data_root / Path(frame["file_path"] + ".png")
             # Load the image
+            img = imageio.imread(img_path)
+            img = PIL.Image.fromarray(img)
+            img = img.resize(self.image_size)
             img = (
-                torch.tensor((imageio.imread(img_path) / 255.0).astype(np.float32))
-                .view(800 * 800, 4)
+                torch.tensor(np.array(img) / 255.0)
+                .view(self.image_size[0] * self.image_size[1], 4)
                 .float()
             )
             tmp_img.append(img)
@@ -42,7 +52,7 @@ class LegoDataset(torch.utils.data.Dataset):
 
         # Load the camera to world matrix
         cam2world = torch.Tensor(self.meta["frames"][idx]["transform_matrix"])
-        H, W = (800, 800)
+        H, W = self.image_size
         # Load the uv coordinates
         uv = generate_uv_coordinates((H, W))
         camera_angle_x = float(self.meta["camera_angle_x"])

@@ -21,6 +21,14 @@ class LegoDatasetTest(unittest.TestCase):
             sample.keys(),
         )
 
+    def test_given_a_valid_data_root_and_rescaled_images__when_loading_a_single_observation__then_the_rgba_image_should_have_the_correct_shape(
+        self,
+    ):
+        sample = LegoDataset(
+            data_root="data/lego", split="train", image_size=(128, 128)
+        )[0]
+        self.assertEqual((128 * 128, 4), sample["rgba"].shape)
+
     def test_given_a_valid_data_root__when_loading_a_single_observation__then_the_rgba_image_should_have_the_correct_shape(
         self,
     ):
