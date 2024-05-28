@@ -2,7 +2,8 @@ from typing import Dict
 from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.train.config.abstract_config import AbstractConfig
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
-from lodnelf.model.planar_fourier import PlanarFourier, PlanarFourierSkip
+from lodnelf.model.planar_fourier import PlanarFourier
+from lodnelf.model.planar_fourier_skip import PlanarFourierSkip
 from lodnelf.train.loss import LFLoss
 from lodnelf.train.train_executor import TrainExecutor
 from lodnelf.train.train_handler import TrainHandler
