@@ -21,4 +21,4 @@ class LFLoss(_LossFn):
 
     def __call__(self, model_out, batch, model=None, val=False) -> _Loss:
         batch_rgb = batch[self.mode]
-        return self.loss(batch_rgb, model_out)
+        return self.loss(batch_rgb, model_out) * 200

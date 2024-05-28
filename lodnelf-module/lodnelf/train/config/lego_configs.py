@@ -2,7 +2,7 @@ from typing import Dict
 from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.train.config.abstract_config import AbstractConfig
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
-from lodnelf.model.planar_fourier import PlanarFourier
+from lodnelf.model.planar_fourier import PlanarFourier, PlanarFourierSkip
 from lodnelf.train.loss import LFLoss
 from lodnelf.train.train_executor import TrainExecutor
 from lodnelf.train.train_handler import TrainHandler
@@ -123,6 +123,31 @@ class PlanarFourierLegoThreeConfig(AbstractLegoConfig):
     def get_model(self):
         return PlanarFourier(
             hidden_dims=[256] * 3,
+            mode="rgba",
+            fourier_mapping_size=64,
+            init_weights=True,
+        )
+
+
+class PlanarFourierLegoThreeToThreeConfig(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "PlanarFourierSkip with hd_before_skip=[256] * 3, hd_after_skip=[256] * 3",
+            "dataset": "lego rescaled to 128x128",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "PlanarFourierLegoThreeToThree"
+
+    def get_model(self):
+        return PlanarFourierSkip(
+            hd_before_skip=[256] * 3,
+            hd_after_skip=[256] * 3,
             mode="rgba",
             fourier_mapping_size=64,
             init_weights=True,
