@@ -5,7 +5,7 @@ import numpy as np
 
 class SineLayer(nn.Module):
     def __init__(
-        self, in_features, out_features, bias=True, is_first=False, omega_0=30
+        self, in_features: int, out_features: int, bias=True, is_first=False, omega_0=30
     ):
         super().__init__()
         self.omega_0 = float(omega_0)

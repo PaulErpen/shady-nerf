@@ -1,5 +1,6 @@
 from typing import Dict
 from lodnelf.data.lego_dataset import LegoDataset
+from lodnelf.model.deep_mlp_raw import DeepMLP
 from lodnelf.train.config.abstract_config import AbstractConfig
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 from lodnelf.train.loss import LFLoss
@@ -10,27 +11,7 @@ import torch.utils.data
 from pathlib import Path
 
 
-class DeepPluckerLegoThreeConfig(AbstractConfig):
-    def __init__(self):
-        config: Dict[str, str] = {
-            "optimizer": "AdamW (lr 1e-4)",
-            "loss": "LFLoss",
-            "batch_size": str(1),
-            "max_epochs": str(150),
-            "model_description": "DeepPlucker with hidden_dims=[256] * 3",
-            "dataset": "lego rescaled to 128x128",
-        }
-        super().__init__(config)
-
-    def get_name(self) -> str:
-        return "DeepPluckerLegoThree"
-
-    def get_model(self):
-        return DeepNeuralNetworkPlucker(
-            hidden_dims=[256] * 3,
-            mode="rgba",
-        )
-
+class AbstractLegoConfig(AbstractConfig):
     def get_train_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
         return LegoDataset(
             data_root=data_directory, split="train", image_size=(128, 128)
@@ -76,3 +57,72 @@ class DeepPluckerLegoThreeConfig(AbstractConfig):
             group_name="experiment",
         )
         train_handler.run(run_name)
+
+
+class DeepPluckerLegoThreeConfig(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "DeepPlucker with hidden_dims=[256] * 3",
+            "dataset": "lego rescaled to 128x128",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "DeepPluckerLegoThree"
+
+    def get_model(self):
+        return DeepNeuralNetworkPlucker(
+            hidden_dims=[256] * 3,
+            mode="rgba",
+            init_weights=True,
+        )
+
+
+class DeepPluckerLegoSixConfig(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "DeepPlucker with hidden_dims=[256] * 6",
+            "dataset": "lego rescaled to 128x128",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "DeepPluckerLegoSix"
+
+    def get_model(self):
+        return DeepNeuralNetworkPlucker(
+            hidden_dims=[256] * 6,
+            mode="rgba",
+            init_weights=True,
+        )
+
+
+class DeepMLPLegoSixConfig(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "DeepMLP with hidden_dims=[256] * 6",
+            "dataset": "lego rescaled to 128x128",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "DeepMLPLegoSix"
+
+    def get_model(self):
+        return DeepMLP(
+            hidden_dims=[256] * 6,
+            mode="rgba",
+            init_weights=True,
+        )

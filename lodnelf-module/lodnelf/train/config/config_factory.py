@@ -5,7 +5,10 @@ from lodnelf.train.config.red_car_configs import (
     SimpleRedCarModelConfigDeepPlucker6,
     SimpleRedCarModelMySiren,
 )
-from lodnelf.train.config.lego_configs import DeepPluckerLegoThreeConfig
+from lodnelf.train.config.lego_configs import (
+    DeepPluckerLegoThreeConfig,
+    DeepPluckerLegoSixConfig,
+)
 from lodnelf.train.config.abstract_config import AbstractConfig
 
 
@@ -24,6 +27,9 @@ class ConfigFactory:
 
         lego_three = DeepPluckerLegoThreeConfig()
         self.configs[lego_three.get_name()] = lego_three
+
+        lego_six = DeepPluckerLegoSixConfig()
+        self.configs[lego_six.get_name()] = lego_six
 
     def get_by_name(self, name: str) -> AbstractConfig:
         if name not in self.configs:

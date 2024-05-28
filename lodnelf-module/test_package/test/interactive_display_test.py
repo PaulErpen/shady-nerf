@@ -12,6 +12,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         InteractiveDisplay(
             "SimpleRedCarModelDeepPlucker",
             "models/experiment_deep_plucker_7/model_epoch_148.pt",
+            "data",
         )
 
     def test_given_a_valid_config_and_model_path__when_generating_a_new_image__then_nothing_is_raised(
@@ -20,6 +21,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         interactive_display = InteractiveDisplay(
             "SimpleRedCarModelDeepPlucker",
             "models/experiment_deep_plucker_7/model_epoch_148.pt",
+            "data",
         )
         cam2world_matrix = np.eye(4)  # Initial camera to world matrix (identity matrix)
 
@@ -31,6 +33,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         interactive_display = InteractiveDisplay(
             "SimpleRedCarModelDeepPlucker",
             "models/experiment_deep_plucker_7/model_epoch_148.pt",
+            "data",
         )
         cam2world_matrix = np.array(
             [
@@ -49,6 +52,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         interactive_display = InteractiveDisplay(
             "SimpleRedCarModelDeepPlucker",
             "models/experiment_deep_plucker_7/model_epoch_148.pt",
+            "data",
         )
         cam2world_matrix = np.eye(4)  # Initial camera to world matrix (identity matrix)
         rotated = np.matmul(
@@ -64,6 +68,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         interactive_display = InteractiveDisplay(
             "SimpleRedCarModelDeepPlucker",
             "models/experiment_deep_plucker_7/model_epoch_148.pt",
+            "data",
         )
         cam2world_matrix = torch.tensor(
             [
@@ -86,6 +91,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         interactive_display = InteractiveDisplay(
             "SimpleRedCarModelDeepPlucker",
             "models/experiment_deep_plucker_7/model_epoch_148.pt",
+            "data",
         )
 
         interactive_display.run()
@@ -96,6 +102,7 @@ class InteractiveDisplayTest(unittest.TestCase):
         interactive_display = InteractiveDisplay(
             "SimpleRedCarModelSirenPlucker",
             "models/new_sinusoid_1/model_epoch_31.pt",
+            "data",
         )
 
         interactive_display.run()
@@ -106,6 +113,19 @@ class InteractiveDisplayTest(unittest.TestCase):
         interactive_display = InteractiveDisplay(
             "SimpleRedCarModelDeepPlucker6",
             "models/new_plucker_1/model_epoch_63.pt",
+            "data",
+        )
+
+        interactive_display.run()
+
+    def test_given_a_valid_deep_plucker_3_with_lego_dataset__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "DeepPluckerLegoThree",
+            "models/lego_deep_3_3/model_epoch_55.pt",
+            "data/lego",
+            mode="rgba",
         )
 
         interactive_display.run()

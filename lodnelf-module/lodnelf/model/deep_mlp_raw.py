@@ -2,16 +2,17 @@ from typing import List, Literal
 import torch.nn as nn
 from lodnelf.geometry import geometry
 from lodnelf.model.components.deep_neural_network import DeepNeuralNetwork
+import torch
 
 
-class DeepNeuralNetworkPlucker(nn.Module):
+class DeepMLP(nn.Module):
     def __init__(
         self,
         hidden_dims: List[int],
         mode: Literal["rgb", "rgba"] = "rgb",
         init_weights: bool = False,
     ):
-        super(DeepNeuralNetworkPlucker, self).__init__()
+        super(DeepMLP, self).__init__()
         self.deep_neural_network = DeepNeuralNetwork(
             6, hidden_dims, 3 if mode == "rgb" else 4, init_weights=init_weights
         )
@@ -19,14 +20,17 @@ class DeepNeuralNetworkPlucker(nn.Module):
 
     def forward(self, input):
         # embedding
-        b, n_qry = input["uv"].shape[0:2]
-        plucker_embeddings = geometry.plucker_embedding(
-            input["cam2world"], input["uv"], input["intrinsics"]
+        uv = input["uv"]
+        cam2world = input["cam2world"]
+        intrinsics = input["intrinsics"]
+        ray_dirs = geometry.get_ray_directions(
+            uv, cam2world=cam2world, intrinsics=intrinsics
         )
-        plucker_embeddings.requires_grad_(True)
-        plucker_embeddings = plucker_embeddings.view(b, n_qry, 6)
+        cam_pos = geometry.get_ray_origin(cam2world)
+        model_input = torch.cat([ray_dirs, cam_pos], dim=-1)
+        model_input.requires_grad_(True)
 
         # network
-        x = self.deep_neural_network(plucker_embeddings)
+        x = self.deep_neural_network(model_input)
 
         return x

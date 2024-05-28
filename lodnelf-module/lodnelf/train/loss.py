@@ -17,7 +17,8 @@ class LFLoss(_LossFn):
         self.l2_weight = l2_weight
         self.reg_weight = reg_weight
         self.mode: Literal["rgb", "rgba"] = mode
+        self.loss = nn.MSELoss()
 
     def __call__(self, model_out, batch, model=None, val=False) -> _Loss:
         batch_rgb = batch[self.mode]
-        return nn.MSELoss()(batch_rgb, model_out) * 200
+        return self.loss(batch_rgb, model_out)
