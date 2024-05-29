@@ -35,14 +35,14 @@ class AbstractLegoConfig(AbstractConfig):
         executor = TrainExecutor(
             model=simple_model,
             optimizer=torch.optim.AdamW(simple_model.parameters(), lr=1e-4),
-            loss=LFLoss(mode="rgba"),
+            loss=LFLoss(),
             batch_size=64,
             device=device,
             train_data=train_dataset,
         )
         val_executor = ValidationExecutor(
             model=simple_model,
-            loss=LFLoss(mode="rgba"),
+            loss=LFLoss(),
             batch_size=1,
             device=device,
             val_data=val_dataset,
