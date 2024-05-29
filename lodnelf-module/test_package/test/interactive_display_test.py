@@ -129,3 +129,15 @@ class InteractiveDisplayTest(unittest.TestCase):
         )
 
         interactive_display.run()
+
+    def test_given_a_valid_planar_fourier_skip_with_lego_dataset__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "PlanarFourierLegoThreeToThree",
+            "models/lego_planar_fourier_3_to_3_1/model_epoch_17.pt",
+            "data/lego",
+            mode="rgba",
+        )
+
+        interactive_display.run()
