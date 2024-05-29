@@ -14,9 +14,9 @@ class LossTest(unittest.TestCase):
     def test_given_an_actual_lego_model_output_and_a_target__when_calculating_the_loss__then_raise_no_errors(
         self,
     ):
-        batch = util.add_batch_dim_to_dict(self.lego[0])
+        batch = util.add_batch_dim_to_dict(util.add_batch_dim_to_dict(self.lego[0]))
         model_output = DeepNeuralNetworkPlucker([123], mode="rgba")(batch)
-        LFLoss(mode="rgba")(
+        LFLoss()(
             model_out=model_output,
             batch=batch,
         )

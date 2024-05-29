@@ -1,7 +1,8 @@
-from typing import List, Literal
+from typing import List, Literal, Tuple
 from torch import nn
 from lodnelf.model.components.sine_layer import SineLayer
-from lodnelf.geometry import geometry
+from lodnelf.geometry.plucker_coordinates import plucker_coordinates
+import torch
 
 
 class SirenPlucker(nn.Module):
@@ -30,14 +31,9 @@ class SirenPlucker(nn.Module):
         # Create the model
         self.siren = nn.Sequential(*layers)
 
-    def forward(self, input):
-        # embedding
-        b, n_qry = input["uv"].shape[0:2]
-        plucker_embeddings = geometry.plucker_embedding(
-            input["cam2world"], input["uv"], input["intrinsics"]
-        )
-        plucker_embeddings.requires_grad_(True)
-        plucker_embeddings = plucker_embeddings.view(b, n_qry, 6)
+    def forward(self, input: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]):
+        ray_origin, ray_dir_world, _ = input
+        plucker_embeddings = plucker_coordinates(ray_origin, ray_dir_world)
 
         # network
         x = self.siren(plucker_embeddings)

@@ -1,7 +1,7 @@
 from torch import nn
 from lodnelf.model.components.deep_neural_network import DeepNeuralNetwork
 from lodnelf.model.planar_fourier import PlanarFourier
-from typing import List, Literal
+from typing import List, Literal, Tuple
 import torch
 
 
@@ -31,7 +31,7 @@ class PlanarFourierSkip(nn.Module):
             init_weights=init_weights,
         )
 
-    def forward(self, input):
+    def forward(self, input: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]):
         # embedding
         identity = self.planar_fourier.prepare_fourier_features(input)
         x = self.planar_fourier(input)

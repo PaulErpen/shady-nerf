@@ -34,8 +34,8 @@ class PlanarFourierSkipTest(unittest.TestCase):
             mode="rgba",
         )
 
-        model_input = util.add_batch_dim_to_dict(self.lego[0])
+        model_input = util.add_batch_dim_to_dict(util.add_batch_dim_to_dict(self.lego[0]))
         output = model(model_input)
 
         self.assertIsNotNone(output)
-        self.assertEqual(output.shape, (1, 128 * 128, 4))
+        self.assertEqual(output.shape, (1, 1, 4))

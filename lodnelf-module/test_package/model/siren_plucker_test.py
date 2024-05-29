@@ -24,8 +24,8 @@ class SirenPluckerTest(unittest.TestCase):
         model = SirenPlucker(hidden_dims=[256])
 
         query = self.lego[0]
-        model_input = util.add_batch_dim_to_dict(query)
+        model_input = util.add_batch_dim_to_dict(util.add_batch_dim_to_dict(query))
         output = model(model_input)
 
         self.assertIsNotNone(output)
-        self.assertEqual(output.shape, (1, 128 * 128, 3))
+        self.assertEqual(output.shape, (1, 1, 3))

@@ -12,7 +12,9 @@ from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 class TrainExecutorTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.lego = LegoDataset(data_root="data/lego", split="train")
+        cls.lego = LegoDataset(
+            data_root="data/lego", split="train", limit=2, image_size=(12, 12)
+        )
 
     def test_given_a_valid_mocks__when_executing_a_training_run__then_the_output_is_a_float(
         self,
@@ -32,9 +34,7 @@ class TrainExecutorTest(unittest.TestCase):
     def test_given_valid_props_for_model_training__when_executing_a_training_run__no_errors_are_raised(
         self,
     ):
-        simple_model = DeepNeuralNetworkPlucker(
-            hidden_dims=[20, 30],
-        )
+        simple_model = DeepNeuralNetworkPlucker(hidden_dims=[20, 30], mode="rgba")
         executor = TrainExecutor(
             model=simple_model,
             optimizer=torch.optim.Adam(self.MockedModel().parameters()),
