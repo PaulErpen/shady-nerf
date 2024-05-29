@@ -43,7 +43,7 @@ class AbstractLegoConfig(AbstractConfig):
         val_executor = ValidationExecutor(
             model=simple_model,
             loss=LFLoss(),
-            batch_size=1,
+            batch_size=64,
             device=device,
             val_data=val_dataset,
         )
