@@ -14,6 +14,18 @@ class LegoDatasetTest(unittest.TestCase):
     ):
         self.assertEqual(len(self.dataset), 10 * 800 * 800)
 
+    def test_given_a_valid_setup__when_instantiating__the_ray_origins_must_have_the_right_dimensions(self):
+        ray_origins = self.dataset.ray_origins
+        self.assertEqual(ray_origins.shape, (10, 3))
+
+    def test_given_a_valid_setup__when_instantiating__the_images_must_have_the_right_dimensions(self):
+        images = self.dataset.images
+        self.assertEqual(images.shape, (10, 800, 800, 4))
+
+    def test_given_a_valid_setup__when_instantiating__the_ray_directions_must_have_the_right_dimensions(self):
+        ray_directions = self.dataset.ray_directions
+        self.assertEqual(ray_directions.shape, (10, 800, 800, 3))
+
     def test_given_a_valid_data_root__when_loading_a_single_observation__then_it_return_a_tuple(
         self,
     ):

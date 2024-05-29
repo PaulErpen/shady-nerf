@@ -36,7 +36,7 @@ class AbstractLegoConfig(AbstractConfig):
             model=simple_model,
             optimizer=torch.optim.AdamW(simple_model.parameters(), lr=1e-4),
             loss=LFLoss(mode="rgba"),
-            batch_size=1,
+            batch_size=64,
             device=device,
             train_data=train_dataset,
         )

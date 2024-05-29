@@ -1,6 +1,7 @@
-from typing import List, Literal
+from typing import List, Literal, Tuple
+import torch
 import torch.nn as nn
-from lodnelf.geometry import geometry
+from lodnelf.geometry.plucker_coordinates import plucker_coordinates
 from lodnelf.model.components.deep_neural_network import DeepNeuralNetwork
 
 
@@ -17,16 +18,12 @@ class DeepNeuralNetworkPlucker(nn.Module):
         )
         self.mode = mode
 
-    def forward(self, input):
+    def forward(self, input: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]):
         # embedding
-        b, n_qry = input["uv"].shape[0:2]
-        plucker_embeddings = geometry.plucker_embedding(
-            input["cam2world"], input["uv"], input["intrinsics"]
-        )
-        plucker_embeddings.requires_grad_(True)
-        plucker_embeddings = plucker_embeddings.view(b, n_qry, 6)
+        ray_origin, ray_dir_world, _ = input
+        plucker = plucker_coordinates(ray_origin, ray_dir_world)
 
         # network
-        x = self.deep_neural_network(plucker_embeddings)
+        x = self.deep_neural_network(plucker)
 
         return x

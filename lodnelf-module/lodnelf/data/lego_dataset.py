@@ -1,6 +1,8 @@
 from typing import Literal, Tuple
 import imageio
-from lodnelf.geometry.compute_ray_space_ray_directions import compute_cam_space_ray_directions
+from lodnelf.geometry.compute_ray_space_ray_directions import (
+    compute_cam_space_ray_directions,
+)
 from lodnelf.geometry.generate_uv_coordinates import generate_uv_coordinates
 import torch.utils.data
 import json
@@ -15,11 +17,17 @@ class LegoDataset(torch.utils.data.Dataset):
         data_root: str,
         split: Literal["train", "val", "test"],
         limit: int | None = None,
+        image_size: Tuple[int, int] = (800, 800),
     ):
         self.meta = {}
         self.split = split
         self.data_root = Path(data_root)
-        self.image_size = (800, 800)
+        self.image_size = image_size
+
+        if self.image_size[0] != self.image_size[1]:
+            raise ValueError("Only square images are supported")
+        if self.image_size[0] > 800:
+            raise ValueError("Images larger than 800x800 are not supported")
 
         meta_path = Path(data_root) / Path("transforms_{}.json".format(self.split))
 
@@ -41,6 +49,7 @@ class LegoDataset(torch.utils.data.Dataset):
             # Load the image
             img = imageio.imread(img_path)
             img = PIL.Image.fromarray(img)
+            img = img.resize(self.image_size)
             img = torch.tensor(np.array(img) / 255.0).float()
             tmp_img.append(img)
             poses.append(np.array(frame["transform_matrix"]))
@@ -49,7 +58,9 @@ class LegoDataset(torch.utils.data.Dataset):
         self.images = torch.stack(tmp_img, dim=0)
         self.camera_angle_x = float(self.meta["camera_angle_x"])
 
-        focal_length = 0.5 * 800 / np.tan(0.5 * self.camera_angle_x)
+        focal_length = (
+            0.5 * 800 / np.tan(0.5 * self.camera_angle_x) * (self.image_size[0] / 800)
+        )
 
         self.ray_origins = self.poses[:, :3, 3]
 
@@ -65,15 +76,14 @@ class LegoDataset(torch.utils.data.Dataset):
             ray_directions.append(ray_direction)
 
         return torch.stack(ray_directions, dim=0)
-    
 
     def __len__(self):
         return self.images.shape[0] * self.image_size[0] * self.image_size[1]
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         col = self.images.view(-1, 4)[idx]
         img_idx = idx // (self.image_size[0] * self.image_size[1])
         ray_origin = self.ray_origins[img_idx]
-        ray_dir_world = self.ray_directions[img_idx].view(-1, 3)[idx]
+        ray_dir_world = self.ray_directions.view(-1, 3)[idx]
 
         return ray_origin, ray_dir_world, col
