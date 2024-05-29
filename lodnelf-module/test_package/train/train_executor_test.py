@@ -1,10 +1,10 @@
 import unittest
+from lodnelf.data.lego_dataset import LegoDataset
 import torch.nn as nn
 import torch
 from lodnelf.train.train_executor import TrainExecutor
 import torch.utils
 import torch.utils.data
-from lodnelf.data.hdf5dataset import get_instance_datasets_hdf5
 from lodnelf.train.loss import LFLoss, _LossFn
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 
@@ -12,13 +12,7 @@ from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 class TrainExecutorTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.dataset = get_instance_datasets_hdf5(
-            root="data/hdf5/cars_train.hdf5",
-            max_num_instances=1,
-            specific_observation_idcs=None,
-            sidelen=128,
-            max_observations_per_instance=9,
-        )[0]
+        cls.lego = LegoDataset(data_root="data/lego", split="train")
 
     def test_given_a_valid_mocks__when_executing_a_training_run__then_the_output_is_a_float(
         self,
@@ -47,7 +41,7 @@ class TrainExecutorTest(unittest.TestCase):
             loss=LFLoss(),
             batch_size=3,
             device="cpu",
-            train_data=self.dataset,
+            train_data=self.lego,
         )
 
         executor.train()
