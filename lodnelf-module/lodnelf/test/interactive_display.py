@@ -35,8 +35,6 @@ class InteractiveDisplay:
 
         self.start_cam2world_matrix = self.config.get_initial_cam2world_matrix()
         self.focal_length = self.config.get_camera_focal_length()
-        # initialize a translation on the cam2world matrix
-        self.start_cam2world_matrix[:3, 3] = torch.tensor([200.0, 300.0, 200.0])
 
     def run(self):
         pygame.init()
@@ -65,11 +63,11 @@ class InteractiveDisplay:
             current_rotation_matrix = np.eye(3)
             if rotation_x is not None:
                 current_rotation_matrix = rotation_matrix(
-                    [0, -1, 0], np.radians(rotation_x)
+                    [0, 0, 1], np.radians(rotation_x)
                 )
             if rotation_y is not None:
                 current_rotation_matrix = (
-                    rotation_matrix([-1, 0, 0], np.radians(rotation_y))
+                    rotation_matrix([1, 0, 0], np.radians(rotation_y))
                     @ current_rotation_matrix
                 )
             if rotation_x is not None or rotation_y is not None:
@@ -97,19 +95,18 @@ class InteractiveDisplay:
     def update_image(self, cam2world_matrix):
         H, W = self.config.get_output_image_size()
         directions = compute_cam_space_ray_directions(H, W, self.focal_length)
-        world_space_directions = directions.view(-1, 3) @ cam2world_matrix[:3, :3]
+        world_space_directions = directions.view(-1, 3) @ cam2world_matrix[:3, :3].T
         # repeat the cam2world matrix for each pixel
         model_input = util.add_batch_dim_to_dict(
             util.add_batch_dim_to_dict(
                 (
-                    cam2world_matrix[3:, :3].expand(world_space_directions.shape[0], 3),
+                    cam2world_matrix[:3, 3].expand(world_space_directions.shape[0], 3),
                     world_space_directions,
                     torch.zeros((world_space_directions.shape[0], 3)),
                 )
             )
         )
         model_output = self.model(model_input)
-        model_output = model_output
         model_output = (
             model_output.view(H, W, 3 if self.mode == "rgb" else 4)
             .detach()
