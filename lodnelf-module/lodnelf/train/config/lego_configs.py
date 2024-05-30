@@ -106,6 +106,8 @@ class DeepPluckerLegoThreeConfig(AbstractLegoConfig):
             "max_epochs": str(150),
             "model_description": "DeepPlucker with hidden_dims=[256] * 3",
             "dataset": "lego rescaled to 128x128",
+            "train_batch_size": "64",
+            "val_batch_size": "64",
         }
         super().__init__(config)
 
