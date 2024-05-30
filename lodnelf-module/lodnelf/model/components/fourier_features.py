@@ -14,4 +14,4 @@ class FourierFeatures(nn.Module):
         x_proj = torch.einsum("bqd, p -> bqdp", x, self.exp).view(
             b, q, d * len(self.exp)
         )
-        return torch.cat([torch.sin(x_proj), torch.cos(x_proj)], dim=-1)
+        return torch.cat([x, torch.sin(x_proj), torch.cos(x_proj)], dim=-1)

@@ -23,7 +23,7 @@ class FourierFeaturesTest(unittest.TestCase):
         fourier_features = FourierFeatures(10)
         input = torch.randn(2, 3, 6)
         output = fourier_features(input)
-        self.assertEqual(output.shape, (2, 3, 120))
+        self.assertEqual(output.shape, (2, 3, 126))
 
     def test_given_a_simple_input__when_forwarding_input__then_the_output_is_correct(
         self,
@@ -38,6 +38,8 @@ class FourierFeaturesTest(unittest.TestCase):
                     [
                         [
                             [
+                                1,
+                                2,
                                 np.sin(np.pi),
                                 np.sin(np.pi * 2),
                                 np.sin(np.pi * 2),
