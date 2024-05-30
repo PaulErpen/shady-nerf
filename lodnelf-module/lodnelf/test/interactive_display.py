@@ -1,4 +1,4 @@
-from typing import Literal, Tuple
+from typing import Literal
 from lodnelf.geometry.compute_ray_space_ray_directions import (
     compute_cam_space_ray_directions,
 )
@@ -9,9 +9,7 @@ from PIL import Image
 from lodnelf.util import util
 import torch
 from lodnelf.train.config.config_factory import ConfigFactory
-from lodnelf.geometry.generate_uv_coordinates import generate_uv_coordinates
 from lodnelf.geometry.rotation_matrix import rotation_matrix
-from lodnelf.geometry.look_at import look_at
 
 
 class InteractiveDisplay:
