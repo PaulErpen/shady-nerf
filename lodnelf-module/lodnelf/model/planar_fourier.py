@@ -28,7 +28,7 @@ class PlanarFourier(nn.Module):
             raise ValueError("out_dim must be provided when mode is 'custom'")
 
         self.deep_neural_network = DeepNeuralNetwork(
-            input_dim=3 + fourier_mapping_size * 2 * 3,
+            input_dim=6 + fourier_mapping_size * 2 * 3,
             hidden_dims=hidden_dims,
             output_dim=out,
             init_weights=init_weights,

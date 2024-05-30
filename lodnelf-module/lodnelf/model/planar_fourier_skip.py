@@ -25,7 +25,7 @@ class PlanarFourierSkip(nn.Module):
         )
 
         self.deep_neural_network_2 = DeepNeuralNetwork(
-            input_dim=hd_before_skip[-1] + 3 + fourier_mapping_size * 2 * 3,
+            input_dim=hd_before_skip[-1] + 6 + fourier_mapping_size * 2 * 3,
             hidden_dims=hd_after_skip,
             output_dim=3 if mode == "rgb" else 4,
             init_weights=init_weights,
