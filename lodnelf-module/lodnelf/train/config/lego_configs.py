@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.train.config.abstract_config import AbstractConfig
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
@@ -15,11 +15,48 @@ from pathlib import Path
 class AbstractLegoConfig(AbstractConfig):
     def get_train_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
         return LegoDataset(
-            data_root=data_directory, split="train", image_size=(128, 128)
+            data_root=data_directory,
+            split="train",
+            image_size=self.get_output_image_size(),
         )
 
     def get_val_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
-        return LegoDataset(data_root=data_directory, split="val", image_size=(128, 128))
+        return LegoDataset(
+            data_root=data_directory,
+            split="val",
+            image_size=self.get_output_image_size(),
+        )
+
+    def get_output_image_size(self) -> Tuple[int, int]:
+        return 128, 128
+
+    def get_camera_focal_length(self) -> float:
+        return 1111.111 * (self.get_output_image_size()[0] / 800)
+
+    def get_initial_cam2world_matrix(self):
+        return torch.tensor(
+            [
+                [
+                    -0.9999021887779236,
+                    0.004192245192825794,
+                    -0.013345719315111637,
+                    -0.05379832163453102,
+                ],
+                [
+                    -0.013988681137561798,
+                    -0.2996590733528137,
+                    0.95394366979599,
+                    3.845470428466797,
+                ],
+                [
+                    -4.656612873077393e-10,
+                    0.9540371894836426,
+                    0.29968830943107605,
+                    1.2080823183059692,
+                ],
+                [0.0, 0.0, 0.0, 1.0],
+            ]
+        ).float()
 
     def run(
         self, run_name: str, model_save_path: Path, data_directory: str, device: str
