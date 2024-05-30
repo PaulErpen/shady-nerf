@@ -10,8 +10,6 @@ class FourierFeatures(nn.Module):
         self.exp = nn.Parameter(self.exp, requires_grad=False)
 
     def forward(self, x: torch.Tensor):
-        b, q, d = x.shape
-        x_proj = torch.einsum("bqd, p -> bqdp", x, self.exp).view(
-            b, q, d * len(self.exp)
-        )
+        b, d = x.shape
+        x_proj = torch.einsum("bd, p -> bdp", x, self.exp).view(b, d * len(self.exp))
         return torch.cat([x, torch.sin(x_proj), torch.cos(x_proj)], dim=-1)

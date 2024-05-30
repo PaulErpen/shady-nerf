@@ -21,15 +21,15 @@ class FourierFeaturesTest(unittest.TestCase):
         self,
     ):
         fourier_features = FourierFeatures(10)
-        input = torch.randn(2, 3, 6)
+        input = torch.randn(2, 6)
         output = fourier_features(input)
-        self.assertEqual(output.shape, (2, 3, 126))
+        self.assertEqual(output.shape, (2, 126))
 
     def test_given_a_simple_input__when_forwarding_input__then_the_output_is_correct(
         self,
     ):
         fourier_features = FourierFeatures(2)
-        input = torch.tensor([[[1, 2]]])
+        input = torch.tensor([[1, 2]])
         output = fourier_features(input)
         self.assertTrue(
             torch.allclose(
