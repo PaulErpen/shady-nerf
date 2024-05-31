@@ -26,6 +26,9 @@ class PsnrMetricResult(AbstractMetricResult):
     def get_value(self) -> float:
         return self.psnr
 
+    def get_name(self) -> str:
+        return "PSNR"
+
 
 class PsnrMetric(AbstractImageMetric):
     def __call__(
