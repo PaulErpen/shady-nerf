@@ -6,11 +6,22 @@ import torch
 
 
 class PsnrMetricResult(AbstractMetricResult):
-    def __init__(self, psnr: float):
+    def __init__(self, psnr: float, n: int = 1):
         self.psnr = psnr
+        self.n = n
 
     def is_better_than(self, other: "PsnrMetricResult") -> bool:
+        if self.n != other.n:
+            raise ValueError(
+                f"Expected the number of images to be the same, got {self.n} and {other.n}"
+            )
         return self.psnr > other.psnr
+
+    def merge(self, other: "PsnrMetricResult") -> "PsnrMetricResult":
+        return PsnrMetricResult(
+            (self.psnr * self.n + other.psnr * other.n) / (self.n + other.n),
+            self.n + other.n,
+        )
 
 
 class PsnrMetric(AbstractImageMetric):

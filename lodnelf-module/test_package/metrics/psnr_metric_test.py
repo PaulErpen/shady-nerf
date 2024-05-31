@@ -68,3 +68,19 @@ class PsnrMetricTest(unittest.TestCase):
         result1 = PsnrMetricResult(10)
         result2 = PsnrMetricResult(20)
         self.assertFalse(result1.is_better_than(result2))
+
+    def test_given_two_psnr_results__when_merging_them__then_return_a_new_result_with_the_average_psnr(
+        self,
+    ):
+        result1 = PsnrMetricResult(6, 1)
+        result2 = PsnrMetricResult(3, 2)
+        merged_result = result1.merge(result2)
+        self.assertEqual(merged_result.psnr, 4)
+
+    def test_given_two_results_with_different_ns__when_comparing_them__then_raise_exception(
+        self,
+    ):
+        result1 = PsnrMetricResult(6, 1)
+        result2 = PsnrMetricResult(3, 2)
+        with self.assertRaises(ValueError):
+            result1.is_better_than(result2)
