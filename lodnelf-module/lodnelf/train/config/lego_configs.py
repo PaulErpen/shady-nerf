@@ -1,5 +1,6 @@
 from typing import Dict, Tuple
 from lodnelf.data.lego_dataset import LegoDataset
+from lodnelf.model.full_fourier import FullFourier
 from lodnelf.train.config.abstract_config import AbstractConfig
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 from lodnelf.model.planar_fourier import PlanarFourier
@@ -191,5 +192,30 @@ class PlanarFourierLegoThreeToThreeConfig(AbstractLegoConfig):
             hd_after_skip=[256] * 3,
             mode="rgba",
             fourier_mapping_size=64,
+            init_weights=True,
+        )
+
+
+class FullFourierLegoThreeConfig(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "PlanarFourierSkip with hidden_dims=[256] * 3, fourier_mapping_size=6",
+            "dataset": "lego rescaled to 128x128",
+            "fourier_mapping_size": "6",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "FullFourierThree"
+
+    def get_model(self):
+        return FullFourier(
+            hidden_dims=[256] * 3,
+            mode="rgba",
+            fourier_mapping_size=6,
             init_weights=True,
         )

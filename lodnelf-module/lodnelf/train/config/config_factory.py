@@ -5,6 +5,7 @@ from lodnelf.train.config.lego_configs import (
     DeepPluckerLegoSixConfig,
     PlanarFourierLegoThreeConfig,
     PlanarFourierLegoThreeToThreeConfig,
+    FullFourierLegoThreeConfig,
 )
 from lodnelf.train.config.abstract_config import AbstractConfig
 
@@ -24,6 +25,9 @@ class ConfigFactory:
 
         lego_planar_fourier_3_to_3 = PlanarFourierLegoThreeToThreeConfig()
         self.configs[lego_planar_fourier_3_to_3.get_name()] = lego_planar_fourier_3_to_3
+
+        lego_full_fourier = FullFourierLegoThreeConfig()
+        self.configs[lego_full_fourier.get_name()] = lego_full_fourier
 
     def get_by_name(self, name: str) -> AbstractConfig:
         if name not in self.configs:
