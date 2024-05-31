@@ -1,4 +1,3 @@
-from typing import Any, Callable
 import torch.nn as nn
 from torch import optim
 from torch.utils.data.dataset import Dataset

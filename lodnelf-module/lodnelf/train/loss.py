@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Literal, Tuple
+from typing import Tuple
 import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss
@@ -7,7 +7,13 @@ from torch.nn.modules.loss import _Loss
 
 class _LossFn(ABC):
     @abstractmethod
-    def __call__(self, model_out, batch, model=None, val=False) -> _Loss:
+    def __call__(
+        self,
+        model_out: torch.Tensor,
+        batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
+        model=None,
+        val=False,
+    ) -> _Loss:
         pass
 
 
