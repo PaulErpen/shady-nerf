@@ -152,8 +152,9 @@ class PlanarFourierLegoThreeConfig(AbstractLegoConfig):
             "loss": "LFLoss",
             "batch_size": str(1),
             "max_epochs": str(150),
-            "model_description": "PlanarFourier with hidden_dims=[256] * 3",
+            "model_description": "PlanarFourier with hidden_dims=[256] * 3, mapping size 6",
             "dataset": "lego rescaled to 128x128",
+            "fourier_mapping_size": "6",
         }
         super().__init__(config)
 
@@ -164,7 +165,7 @@ class PlanarFourierLegoThreeConfig(AbstractLegoConfig):
         return PlanarFourier(
             hidden_dims=[256] * 3,
             mode="rgba",
-            fourier_mapping_size=64,
+            fourier_mapping_size=6,
             init_weights=True,
         )
 
