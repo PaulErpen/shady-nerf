@@ -22,3 +22,14 @@ class InteractiveDisplayTest(unittest.TestCase):
         )
 
         interactive_display.run()
+
+    def test_given_a_valid_planar_fourier_3_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "PlanarFourierLegoThree",
+            "models/lego_planar_fourier_three_2/model_epoch_9.pt",
+            mode="rgba",
+        )
+
+        interactive_display.run()
