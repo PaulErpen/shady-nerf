@@ -19,3 +19,7 @@ class AbstractMetricResult(ABC):
     @abstractmethod
     def merge(self, other: "AbstractMetricResult") -> "AbstractMetricResult":
         pass
+
+    @abstractmethod
+    def get_value(self) -> float:
+        pass

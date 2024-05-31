@@ -44,7 +44,7 @@ class PsnrMetricTest(unittest.TestCase):
         image1 = torch.rand(1, 256, 256, 3)
         image2 = image1.clone()
         result = metric(image1, image2)
-        self.assertEqual(result.psnr, float("inf"))
+        self.assertEqual(result.get_value(), float("inf"))
 
     def test_given_two_different_images__when_calculating_psnr__then_return_a_float_value(
         self,
@@ -53,7 +53,7 @@ class PsnrMetricTest(unittest.TestCase):
         image1 = torch.rand(1, 256, 256, 3)
         image2 = torch.rand(1, 256, 256, 3)
         result = metric(image1, image2)
-        self.assertIsInstance(result.psnr, float)
+        self.assertIsInstance(result.get_value(), float)
 
     def test_given_two_psnr_results__when_comparing_them__then_return_true_if_the_first_result_is_better(
         self,
