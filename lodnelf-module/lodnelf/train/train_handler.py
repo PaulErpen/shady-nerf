@@ -1,4 +1,5 @@
 from typing import Dict
+from lodnelf.metrics.psnr_metric import calculate_psnr
 from lodnelf.train.train_executor import TrainExecutor
 from pathlib import Path
 import torch
@@ -40,12 +41,24 @@ class TrainHandler:
         for epoch in range(self.max_epochs):
             train_loss = self.train_executor.train()
             print(f"Train loss: {train_loss}")
-            logger.log({"train_loss": train_loss}, step=epoch)
+            logger.log(
+                {
+                    "train_loss": train_loss,
+                    "train_psnr": calculate_psnr(train_loss / 200.0),
+                },
+                step=epoch,
+            )
 
             if epoch % self.validation_frequency == 0:
                 val_loss = self.validation_executor.validate()
                 print(f"Validation loss: {val_loss}")
-                logger.log({"validation_loss": val_loss}, step=epoch)
+                logger.log(
+                    {
+                        "validation_loss": val_loss,
+                        "validation_psnr": calculate_psnr(val_loss / 200.0),
+                    },
+                    step=epoch,
+                )
                 if val_loss < best_validation_loss:
                     best_validation_loss = val_loss
                     no_improvement = 0
