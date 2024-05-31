@@ -44,6 +44,6 @@ class PsnrMetric(AbstractImageMetric):
         return PsnrMetricResult(psnr)
 
     def calculate_psnr(self, image1: torch.Tensor, image2: torch.Tensor) -> float:
-        max1 = torch.max(image1)
+        max_image_val = max(torch.max(image1).item(), torch.max(image2).item())
         mse = torch.mean((image1 - image2) ** 2)
-        return 20 * torch.log10(max1 / torch.sqrt(mse)).item()
+        return 20 * torch.log10(max_image_val / torch.sqrt(mse)).item()
