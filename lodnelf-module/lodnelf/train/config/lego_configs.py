@@ -1,6 +1,7 @@
 from typing import Dict, Tuple
 from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.model.full_fourier import FullFourier
+from lodnelf.model.sh_plucker import ShPlucker
 from lodnelf.train.config.abstract_config import AbstractConfig
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
 from lodnelf.model.planar_fourier import PlanarFourier
@@ -219,3 +220,22 @@ class FullFourierLegoThreeConfig(AbstractLegoConfig):
             fourier_mapping_size=6,
             init_weights=True,
         )
+
+
+class LegoShPlucker(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "ShPlucker with hidden_dims=[256] * 3",
+            "dataset": "lego rescaled to 128x128",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "LegoShPlucker"
+
+    def get_model(self):
+        return ShPlucker(mode="rgba")
