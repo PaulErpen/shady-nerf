@@ -146,3 +146,14 @@ class MyNerfTest(unittest.TestCase):
         rgb_map = self.nerf(util.add_batch_dim_to_dict(sample))
 
         self.assertEqual(rgb_map.shape, (1, 3))
+
+    def test_given_single_observation__when_using_extended_forward__then_return_a_point_alpha_with_correct_shape(
+        self,
+    ):
+        sample = self.lego[0]
+
+        rgb_map, depth_map, acc_map, point_alpha = self.nerf.extended_forward(
+            util.add_batch_dim_to_dict(sample)
+        )
+
+        self.assertEqual(point_alpha.shape, (1, self.n_samples_along_ray, 1))

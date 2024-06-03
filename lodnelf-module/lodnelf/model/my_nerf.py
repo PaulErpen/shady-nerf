@@ -32,7 +32,15 @@ class NeRF(nn.Module):
 
         self.rgb = nn.Linear(256 + 64, 3)
 
-    def forward(self, x):
+    def forward(
+        self, x: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+    ) -> torch.Tensor:
+        rgb_map, depth_map, acc_map, point_alpha = self.extended_forward(x)
+        return rgb_map
+
+    def extended_forward(
+        self, x: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         ray_origin, ray_dir, col = x
         sample_points = self.compute_sample_points(ray_origin, ray_dir)
         fourier_points = self.fourier_features.forward_batched(sample_points)
@@ -41,14 +49,16 @@ class NeRF(nn.Module):
 
         point_alpha = torch.sigmoid(self.alpha(features))
 
-        spherical = embed_spherical_harmonics(ray_dir).repeat(1, self.n_samples_along_ray, 1)
-        point_rgb = torch.sigmoid(
-            self.rgb(torch.cat([features, spherical], dim=-1))
+        spherical = embed_spherical_harmonics(ray_dir).repeat(
+            1, self.n_samples_along_ray, 1
+        )
+        point_rgb = torch.sigmoid(self.rgb(torch.cat([features, spherical], dim=-1)))
+
+        rgb_map, depth_map, acc_map = self.render_rays(
+            point_alpha.squeeze(-1), point_rgb
         )
 
-        rgb_map, depth_map, acc_map = self.render_rays(point_alpha.squeeze(-1), point_rgb)
-
-        return rgb_map
+        return (rgb_map, depth_map, acc_map, point_alpha)
 
     def render_rays(
         self, point_alpha: torch.Tensor, point_rgb: torch.Tensor
