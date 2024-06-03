@@ -255,6 +255,7 @@ class LargeDeepPluckerLego(AbstractLegoConfig):
             "max_epochs": str(150),
             "model_description": "ShPlucker with hidden_dims=[256] * 3",
             "dataset": "lego in 800x800",
+            "subsample": "0.01",
         }
         super().__init__(config)
 
