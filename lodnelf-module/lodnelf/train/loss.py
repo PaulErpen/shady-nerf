@@ -29,4 +29,6 @@ class LFLoss(_LossFn):
         batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
     ) -> _Loss:
         ray_origin, ray_dir_world, color = batch
+        if model_out.shape[-1] == 3 and color.shape[-1] == 4:
+            color = color[:, :3]
         return self.loss(color, model_out) * 200

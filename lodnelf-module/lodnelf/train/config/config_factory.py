@@ -8,6 +8,7 @@ from lodnelf.train.config.lego_configs import (
     FullFourierLegoThreeConfig,
     LegoShPlucker,
     LargeDeepPluckerLego,
+    LargeNeRFLego,
 )
 from lodnelf.train.config.abstract_config import AbstractConfig
 
@@ -33,6 +34,9 @@ class ConfigFactory:
 
         lego_sh_plucker = LegoShPlucker()
         self.configs[lego_sh_plucker.get_name()] = lego_sh_plucker
+
+        lego_large_nerf = LargeNeRFLego()
+        self.configs[lego_large_nerf.get_name()] = lego_large_nerf
 
         lego_large_deep_plucker = LargeDeepPluckerLego()
         self.configs[lego_large_deep_plucker.get_name()] = lego_large_deep_plucker

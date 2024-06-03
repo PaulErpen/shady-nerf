@@ -4,7 +4,7 @@ from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.model.my_nerf import NeRF
 import torch
 from lodnelf.util import util
-
+from torch.utils.data.dataloader import DataLoader
 
 class MyNerfTest(unittest.TestCase):
     @classmethod
@@ -157,3 +157,13 @@ class MyNerfTest(unittest.TestCase):
         )
 
         self.assertEqual(point_alpha.shape, (1, self.n_samples_along_ray, 1))
+
+    def test_given_a_batch__when_forwarding__then_return_the_correct_rgb_map(
+        self,
+    ):
+        loader = DataLoader(self.lego, batch_size=10)
+        batch = next(iter(loader))
+
+        rgb_map = self.nerf(batch)
+
+        self.assertEqual(rgb_map.shape, (10, 3))

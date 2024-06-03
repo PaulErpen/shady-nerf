@@ -1,6 +1,7 @@
 from typing import Dict, Tuple
 from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.model.full_fourier import FullFourier
+from lodnelf.model.my_nerf import NeRF
 from lodnelf.model.sh_plucker import ShPlucker
 from lodnelf.train.config.abstract_config import AbstractConfig
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
@@ -253,7 +254,7 @@ class LargeDeepPluckerLego(AbstractLegoConfig):
             "loss": "LFLoss",
             "batch_size": str(1),
             "max_epochs": str(150),
-            "model_description": "ShPlucker with hidden_dims=[256] * 3",
+            "model_description": "DeepNeuralNetworkPlucker with hidden_dims=[256] * 3",
             "dataset": "lego in 800x800",
             "subsample": "0.01",
         }
@@ -267,6 +268,41 @@ class LargeDeepPluckerLego(AbstractLegoConfig):
             hidden_dims=[256] * 3,
             mode="rgba",
             init_weights=True,
+        )
+
+    def get_output_image_size(self) -> Tuple[int, int]:
+        return 800, 800
+
+    def get_subset_size(self) -> float | None:
+        return 0.01
+
+
+class LargeNeRFLego(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "NeRF with hidden dims [256, 256, 256, 256]",
+            "dataset": "lego in 800x800",
+            "subsample": "0.01",
+            "near": "2.0",
+            "far": "6.0",
+            "n_samples_along_ray": "64",
+            "embed_pos": "6",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "LargeNeRFLego"
+
+    def get_model(self):
+        return NeRF(
+            near=2.0,
+            far=6.0,
+            n_samples_along_ray=64,
+            embed_pos=6,
         )
 
     def get_output_image_size(self) -> Tuple[int, int]:

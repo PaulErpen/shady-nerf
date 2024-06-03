@@ -41,6 +41,7 @@ class NeRF(nn.Module):
     def extended_forward(
         self, x: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        batch_size = x[0].shape[0]
         ray_origin, ray_dir, col = x
         sample_points = self.compute_sample_points(ray_origin, ray_dir)
         fourier_points = self.fourier_features.forward_batched(sample_points)
@@ -49,8 +50,8 @@ class NeRF(nn.Module):
 
         point_alpha = torch.sigmoid(self.alpha(features))
 
-        spherical = embed_spherical_harmonics(ray_dir).repeat(
-            1, self.n_samples_along_ray, 1
+        spherical = embed_spherical_harmonics(ray_dir).expand(
+            batch_size, self.n_samples_along_ray, 64
         )
         point_rgb = torch.sigmoid(self.rgb(torch.cat([features, spherical], dim=-1)))
 
