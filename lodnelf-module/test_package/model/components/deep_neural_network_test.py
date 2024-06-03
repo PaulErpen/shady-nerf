@@ -27,3 +27,19 @@ class DeeptNeuralNetworkTest(unittest.TestCase):
         output = model(x)
 
         self.assertEqual(output.shape, (4, 128 * 128, 6))
+
+    def test_given_a_skip_connection__when_forwarding__then_the_output_has_the_correct_shape(
+        self,
+    ):
+        model = DeepNeuralNetwork(
+            input_dim=128,
+            hidden_dims=[20, 30],
+            output_dim=6,
+            skips=[1],
+        )
+
+        x = torch.randn(4, 128 * 128, 128)
+
+        output = model(x)
+
+        self.assertEqual(output.shape, (4, 128 * 128, 6))

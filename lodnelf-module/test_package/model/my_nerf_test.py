@@ -1,7 +1,9 @@
 import unittest
 
+from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.model.my_nerf import NeRF
 import torch
+from lodnelf.util import util
 
 
 class MyNerfTest(unittest.TestCase):
@@ -11,6 +13,7 @@ class MyNerfTest(unittest.TestCase):
         cls.far = 1.0
         cls.n_samples_along_ray = 10
         cls.nerf = NeRF(cls.near, cls.far, cls.n_samples_along_ray)
+        cls.lego = LegoDataset(data_root="data/lego", split="train", limit=10)
 
     def test_given_a_single_ray_origin_and_direction__when_computing_the_sample_points__then_return_the_correct_tensor(
         self,
@@ -101,3 +104,45 @@ class MyNerfTest(unittest.TestCase):
         sample_points = self.nerf.compute_sample_points(ray_origins, ray_directions)
 
         self.assertEqual(sample_points.shape, (batch_size, self.n_samples_along_ray, 3))
+
+    def test_given_some_random_alpha_and_rgb_values__when_rendering_the_rays__then_return_the_correct_rgb_map(
+        self,
+    ):
+        batch_size = 10
+        point_alpha = torch.rand((batch_size, self.n_samples_along_ray))
+        point_rgb = torch.rand((batch_size, self.n_samples_along_ray, 3))
+
+        rgb_map, _, _ = self.nerf.render_rays(point_alpha, point_rgb)
+
+        self.assertEqual(rgb_map.shape, (batch_size, 3))
+
+    def test_given_some_random_alpha_and_rgb_values__when_rendering_the_rays__then_return_the_correct_depth_map(
+        self,
+    ):
+        batch_size = 10
+        point_alpha = torch.rand((batch_size, self.n_samples_along_ray))
+        point_rgb = torch.rand((batch_size, self.n_samples_along_ray, 3))
+
+        _, depth_map, _ = self.nerf.render_rays(point_alpha, point_rgb)
+
+        self.assertEqual(depth_map.shape, (batch_size,))
+
+    def test_given_some_random_alpha_and_rgb_values__when_rendering_the_rays__then_return_the_correct_acc_map(
+        self,
+    ):
+        batch_size = 10
+        point_alpha = torch.rand((batch_size, self.n_samples_along_ray))
+        point_rgb = torch.rand((batch_size, self.n_samples_along_ray, 3))
+
+        _, _, acc_map = self.nerf.render_rays(point_alpha, point_rgb)
+
+        self.assertEqual(acc_map.shape, (batch_size,))
+
+    def test_given_a_single_sample__when_forwarding__then_return_the_correct_rgb_map(
+        self,
+    ):
+        sample = self.lego[0]
+
+        rgb_map = self.nerf(util.add_batch_dim_to_dict(sample))
+
+        self.assertEqual(rgb_map.shape, (1, 3))

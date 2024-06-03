@@ -13,3 +13,10 @@ class FourierFeatures(nn.Module):
         b, d = x.shape
         x_proj = torch.einsum("bd, p -> bdp", x, self.exp).view(b, d * len(self.exp))
         return torch.cat([x, torch.sin(x_proj), torch.cos(x_proj)], dim=-1)
+
+    def forward_batched(self, x: torch.Tensor):
+        b, n_samples, d = x.shape
+        x_proj = torch.einsum("bnd, p -> bndp", x, self.exp).view(
+            b, n_samples, d * len(self.exp)
+        )
+        return torch.cat([x, torch.sin(x_proj), torch.cos(x_proj)], dim=-1)
