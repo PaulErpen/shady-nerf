@@ -7,6 +7,7 @@ from lodnelf.train.config.lego_configs import (
     PlanarFourierLegoThreeToThreeConfig,
     FullFourierLegoThreeConfig,
     LegoShPlucker,
+    LargeDeepPluckerLego,
 )
 from lodnelf.train.config.abstract_config import AbstractConfig
 
@@ -32,6 +33,9 @@ class ConfigFactory:
 
         lego_sh_plucker = LegoShPlucker()
         self.configs[lego_sh_plucker.get_name()] = lego_sh_plucker
+
+        lego_large_deep_plucker = LargeDeepPluckerLego()
+        self.configs[lego_large_deep_plucker.get_name()] = lego_large_deep_plucker
 
     def get_by_name(self, name: str) -> AbstractConfig:
         if name not in self.configs:

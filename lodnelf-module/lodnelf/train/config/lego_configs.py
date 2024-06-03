@@ -60,6 +60,9 @@ class AbstractLegoConfig(AbstractConfig):
             ]
         ).float()
 
+    def get_subset_size(self) -> float | None:
+        return None
+
     def run(
         self, run_name: str, model_save_path: Path, data_directory: str, device: str
     ):
@@ -78,6 +81,7 @@ class AbstractLegoConfig(AbstractConfig):
             batch_size=64,
             device=device,
             train_data=train_dataset,
+            subset_size=self.get_subset_size(),
         )
         val_executor = ValidationExecutor(
             model=simple_model,
@@ -85,6 +89,7 @@ class AbstractLegoConfig(AbstractConfig):
             batch_size=64,
             device=device,
             val_data=val_dataset,
+            subset_size=self.get_subset_size(),
         )
         model_save_path.mkdir(exist_ok=True)
         train_handler = TrainHandler(
@@ -239,3 +244,32 @@ class LegoShPlucker(AbstractLegoConfig):
 
     def get_model(self):
         return ShPlucker(mode="rgba")
+
+
+class LargeDeepPluckerLego(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "ShPlucker with hidden_dims=[256] * 3",
+            "dataset": "lego in 800x800",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "DeepNeuralNetworkPluckerLegoLarge"
+
+    def get_model(self):
+        return DeepNeuralNetworkPlucker(
+            hidden_dims=[256] * 3,
+            mode="rgba",
+            init_weights=True,
+        )
+
+    def get_output_image_size(self) -> Tuple[int, int]:
+        return 800, 800
+
+    def get_subset_size(self) -> float | None:
+        return 0.1
