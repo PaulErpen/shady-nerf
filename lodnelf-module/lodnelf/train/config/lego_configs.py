@@ -272,4 +272,4 @@ class LargeDeepPluckerLego(AbstractLegoConfig):
         return 800, 800
 
     def get_subset_size(self) -> float | None:
-        return 0.1
+        return 0.01
