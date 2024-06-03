@@ -5,6 +5,7 @@ from lodnelf.train.loss import _LossFn
 import torch
 from tqdm import tqdm
 from lodnelf.util import util
+from torch.utils.data import RandomSampler
 
 
 class ValidationExecutor:
@@ -15,6 +16,7 @@ class ValidationExecutor:
         val_data: Dataset,
         loss: _LossFn,
         batch_size: int,
+        subset_size: float | None = None,
     ) -> None:
         self.model = model
         self.device = device
@@ -22,10 +24,20 @@ class ValidationExecutor:
         self.val_data = val_data
         self.loss = loss
         self.batch_size = batch_size
+        self.subset_size = subset_size
 
     def validate(self):
         self.model.eval()
 
+        sampler = None
+        if self.subset_size is not None:
+            if self.subset_size > 1 or self.subset_size <= 0:
+                raise ValueError("subset_size should be between 0 and 1")
+            sampler = RandomSampler(
+                self.val_data,
+                replacement=False,
+                num_samples=int(self.subset_size * len(self.val_data)),
+            )
         val_data_loader = DataLoader(
             self.val_data, batch_size=self.batch_size, shuffle=False
         )
