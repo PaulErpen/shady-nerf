@@ -30,17 +30,19 @@ class TrainExecutor:
     def train(self):
         self.model.train()
 
-        sampler = None
+        num_samples: int = len(self.train_data)
         if self.subset_size is not None:
             if self.subset_size > 1 or self.subset_size <= 0:
                 raise ValueError("subset_size should be between 0 and 1")
-            sampler = RandomSampler(
-                self.train_data,
-                replacement=False,
-                num_samples=int(self.subset_size * len(self.train_data)),
-            )
+            num_samples = int(len(self.train_data) * self.subset_size)
+
+        sampler = RandomSampler(
+            self.train_data,
+            replacement=False,
+            num_samples=num_samples,
+        )
         train_data_loader = DataLoader(
-            self.train_data, batch_size=self.batch_size, shuffle=True, sampler=sampler
+            self.train_data, batch_size=self.batch_size, sampler=sampler
         )
 
         total_loss = 0

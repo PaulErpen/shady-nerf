@@ -29,17 +29,21 @@ class ValidationExecutor:
     def validate(self):
         self.model.eval()
 
-        sampler = None
+        num_samples: int = len(self.val_data)
         if self.subset_size is not None:
             if self.subset_size > 1 or self.subset_size <= 0:
                 raise ValueError("subset_size should be between 0 and 1")
-            sampler = RandomSampler(
-                self.val_data,
-                replacement=False,
-                num_samples=int(self.subset_size * len(self.val_data)),
-            )
+            num_samples = int(len(self.val_data) * self.subset_size)
+
+        sampler = RandomSampler(
+            self.val_data,
+            replacement=False,
+            num_samples=num_samples,
+        )
         val_data_loader = DataLoader(
-            self.val_data, batch_size=self.batch_size, shuffle=False
+            self.val_data,
+            batch_size=self.batch_size,
+            sampler=sampler,
         )
 
         total_loss = 0
