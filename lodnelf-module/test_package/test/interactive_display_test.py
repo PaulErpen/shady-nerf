@@ -23,3 +23,14 @@ class InteractiveDisplayTest(unittest.TestCase):
         )
 
         interactive_display.run()
+
+    def test_given_a_valid_lego_nerf_config_with_train_val_split_and_model_path__when_running__then_run_the_application(
+        self,
+    ):
+        interactive_display = InteractiveDisplay(
+            "LargeNeRFLego",
+            "models/lego_nerf_2/model_epoch_9.pt",
+            mode="rgb",
+        )
+
+        interactive_display.run()

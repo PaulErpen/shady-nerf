@@ -97,12 +97,12 @@ class InteractiveDisplay:
         directions = compute_cam_space_ray_directions(
             H, W, self.focal_length, fraction=float(128 / H)
         )
-        world_space_directions = directions.view(-1, 3) @ cam2world_matrix[:3, :3].T
+        world_space_ray_directions = directions.view(-1, 3) @ cam2world_matrix[:3, :3].T
         # repeat the cam2world matrix for each pixel
         model_input = (
-            cam2world_matrix[:3, 3].expand(world_space_directions.shape[0], 3),
-            world_space_directions,
-            torch.zeros((world_space_directions.shape[0], 3)),
+            cam2world_matrix[:3, 3].expand(world_space_ray_directions.shape[0], 3),
+            world_space_ray_directions,
+            torch.zeros((world_space_ray_directions.shape[0], 3)),
         )
         model_output = self.model(model_input)
         model_output = (
