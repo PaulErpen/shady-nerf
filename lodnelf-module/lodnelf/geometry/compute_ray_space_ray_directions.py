@@ -1,8 +1,18 @@
 import torch
 
 
-def compute_cam_space_ray_directions(H, W, focal_length):
-    x, y = torch.meshgrid(torch.arange(H), torch.arange(W), indexing="xy")
+def compute_cam_space_ray_directions(
+    H: int, W: int, focal_length: float, fraction: None | float = None
+) -> torch.Tensor:
+    if fraction is not None and (fraction > 1.0 or fraction < 0.0):
+        raise ValueError("fraction must be between 0 and 1")
+    fraction = fraction or 1.0
+
+    x, y = torch.meshgrid(
+        torch.linspace(0, H, steps=int(H * fraction)),
+        torch.linspace(0, W, steps=int(W * fraction)),
+        indexing="xy",
+    )
     directions = torch.stack(
         [
             (x - W * 0.5) / focal_length,
