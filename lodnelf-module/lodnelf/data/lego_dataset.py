@@ -3,7 +3,6 @@ import imageio
 from lodnelf.geometry.compute_ray_space_ray_directions import (
     compute_cam_space_ray_directions,
 )
-from lodnelf.geometry.generate_uv_coordinates import generate_uv_coordinates
 import torch.utils.data
 import json
 from pathlib import Path
