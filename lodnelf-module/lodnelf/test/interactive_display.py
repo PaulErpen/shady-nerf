@@ -94,7 +94,9 @@ class InteractiveDisplay:
 
     def update_image(self, cam2world_matrix):
         H, W = self.config.get_output_image_size()
-        directions = compute_cam_space_ray_directions(H, W, self.focal_length)
+        directions = compute_cam_space_ray_directions(
+            H, W, self.focal_length, fraction=float(128 / H)
+        )
         world_space_directions = directions.view(-1, 3) @ cam2world_matrix[:3, :3].T
         # repeat the cam2world matrix for each pixel
         model_input = (
@@ -104,7 +106,7 @@ class InteractiveDisplay:
         )
         model_output = self.model(model_input)
         model_output = (
-            model_output.view(H, W, 3 if self.mode == "rgb" else 4)
+            model_output.view(128, 128, 3 if self.mode == "rgb" else 4)
             .detach()
             .cpu()
             .numpy()
