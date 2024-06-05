@@ -1,4 +1,4 @@
-from typing import Literal, Tuple
+from typing import Callable, Literal, Tuple
 import imageio
 from lodnelf.geometry.compute_ray_space_ray_directions import (
     compute_cam_space_ray_directions,
@@ -17,11 +17,19 @@ class LegoDataset(torch.utils.data.Dataset):
         split: Literal["train", "val", "test"],
         limit: int | None = None,
         image_size: Tuple[int, int] = (800, 800),
+        transform: (
+            None
+            | Callable[
+                [Tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
+                Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
+            ]
+        ) = None,
     ):
         self.meta = {}
         self.split = split
         self.data_root = Path(data_root)
         self.image_size = image_size
+        self.transform = transform
 
         if self.image_size[0] != self.image_size[1]:
             raise ValueError("Only square images are supported")
@@ -84,5 +92,6 @@ class LegoDataset(torch.utils.data.Dataset):
         img_idx = idx // (self.image_size[0] * self.image_size[1])
         ray_origin = self.ray_origins[img_idx]
         ray_dir_world = self.ray_directions.view(-1, 3)[idx]
+        item = (ray_origin, ray_dir_world, col)
 
-        return ray_origin, ray_dir_world, col
+        return item if self.transform is None else self.transform(item)

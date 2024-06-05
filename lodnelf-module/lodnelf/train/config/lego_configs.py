@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Callable, Dict, Tuple
 from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.model.full_fourier import FullFourier
 from lodnelf.model.my_nerf import NeRF
@@ -21,6 +21,7 @@ class AbstractLegoConfig(AbstractConfig):
             data_root=data_directory,
             split="train",
             image_size=self.get_output_image_size(),
+            transform=self.get_train_transform(),
         )
 
     def get_val_data_set(self, data_directory: str) -> torch.utils.data.Dataset:
@@ -28,7 +29,30 @@ class AbstractLegoConfig(AbstractConfig):
             data_root=data_directory,
             split="val",
             image_size=self.get_output_image_size(),
+            transform=self.get_val_transform(),
         )
+
+    def get_train_transform(
+        self,
+    ) -> (
+        None
+        | Callable[
+            [Tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
+            Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
+        ]
+    ):
+        return None
+
+    def get_val_transform(
+        self,
+    ) -> (
+        None
+        | Callable[
+            [Tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
+            Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
+        ]
+    ):
+        return None
 
     def get_output_image_size(self) -> Tuple[int, int]:
         return 128, 128
@@ -226,6 +250,28 @@ class FullFourierLegoThreeConfig(AbstractLegoConfig):
             fourier_mapping_size=6,
             init_weights=True,
         )
+
+    def get_train_transform(
+        self,
+    ) -> (
+        None
+        | Callable[
+            [Tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
+            Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
+        ]
+    ):
+        return lambda x: (x[0] / 4.0311, x[1], x[2])
+
+    def get_val_transform(
+        self,
+    ) -> (
+        None
+        | Callable[
+            [Tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
+            Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
+        ]
+    ):
+        return lambda x: (x[0] / 4.0311, x[1], x[2])
 
 
 class LegoShPlucker(AbstractLegoConfig):

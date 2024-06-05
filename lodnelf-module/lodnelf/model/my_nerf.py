@@ -42,8 +42,7 @@ class NeRF(nn.Module):
     def extended_forward(
         self, x: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-        ray_origin, ray_dir, col = x
-        batch_size = ray_origin.shape[0]
+        ray_origin, ray_dir, _ = x
         sample_points = self.compute_sample_points(ray_origin, ray_dir)
         fourier_points = self.fourier_features.forward_batched(sample_points)
 
