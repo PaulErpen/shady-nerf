@@ -58,7 +58,7 @@ class AbstractLegoConfig(AbstractConfig):
         return 128, 128
 
     def get_camera_focal_length(self) -> float:
-        return 1111.111 * (self.get_output_image_size()[0] / 800)
+        return 1111.111
 
     def get_initial_cam2world_matrix(self):
         return torch.tensor(
@@ -260,7 +260,7 @@ class FullFourierLegoThreeConfig(AbstractLegoConfig):
             Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
         ]
     ):
-        return lambda x: (x[0] / 4.0311, x[1], x[2])
+        return lambda x: (x[0] / 4.04, x[1] / 1.01, x[2])
 
     def get_val_transform(
         self,
@@ -271,7 +271,7 @@ class FullFourierLegoThreeConfig(AbstractLegoConfig):
             Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
         ]
     ):
-        return lambda x: (x[0] / 4.0311, x[1], x[2])
+        return lambda x: (x[0] / 4.04, x[1] / 1.01, x[2])
     
 class FullSkipFourierLegoThreeConfig(AbstractLegoConfig):
     def __init__(self):
