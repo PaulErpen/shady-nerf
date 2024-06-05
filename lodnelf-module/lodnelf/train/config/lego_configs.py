@@ -287,7 +287,7 @@ class FullSkipFourierLegoThreeConfig(AbstractLegoConfig):
         super().__init__(config)
 
     def get_name(self) -> str:
-        return "FullSkipFourierThree"
+        return "FullSkipFourier5"
 
     def get_model(self):
         return FullFourier(
