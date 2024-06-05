@@ -272,6 +272,53 @@ class FullFourierLegoThreeConfig(AbstractLegoConfig):
         ]
     ):
         return lambda x: (x[0] / 4.0311, x[1], x[2])
+    
+class FullSkipFourierLegoThreeConfig(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(1),
+            "max_epochs": str(150),
+            "model_description": "PlanarFourierSkip with hidden_dims=[256] * 5, fourier_mapping_size=6",
+            "dataset": "lego rescaled to 128x128",
+            "fourier_mapping_size": "6",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "FullSkipFourierThree"
+
+    def get_model(self):
+        return FullFourier(
+            hidden_dims=[256] * 5,
+            mode="rgba",
+            fourier_mapping_size=6,
+            skips=[3],
+            init_weights=True,
+        )
+
+    def get_train_transform(
+        self,
+    ) -> (
+        None
+        | Callable[
+            [Tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
+            Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
+        ]
+    ):
+        return lambda x: (x[0] / 4.0311, x[1], x[2])
+
+    def get_val_transform(
+        self,
+    ) -> (
+        None
+        | Callable[
+            [Tuple[torch.Tensor, torch.Tensor, torch.Tensor]],
+            Tuple[torch.Tensor, torch.Tensor, torch.Tensor],
+        ]
+    ):
+        return lambda x: (x[0] / 4.0311, x[1], x[2])
 
 
 class LegoShPlucker(AbstractLegoConfig):

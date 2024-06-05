@@ -5,6 +5,7 @@ from lodnelf.model.components.fourier_features import FourierFeatures
 from torch import nn
 import torch
 
+
 class FullFourier(nn.Module):
     def __init__(
         self,
@@ -13,6 +14,7 @@ class FullFourier(nn.Module):
         mode: Literal["rgb", "rgba", "custom"] = "rgb",
         init_weights: bool = False,
         custom_out_dim: int | None = None,
+        skips: List[int] = [],
     ):
         super(FullFourier, self).__init__()
         self.fourier_features = FourierFeatures(fourier_mapping_size)
@@ -31,9 +33,12 @@ class FullFourier(nn.Module):
             hidden_dims=hidden_dims,
             output_dim=out,
             init_weights=init_weights,
+            skips=skips,
         )
 
-    def prepare_fourier_features(self, input: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]):
+    def prepare_fourier_features(
+        self, input: Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+    ):
         ray_origin, ray_dir_world, _ = input
         plucker_embeddings = plucker_coordinates(ray_origin, ray_dir_world)
         return self.fourier_features(plucker_embeddings)
