@@ -394,7 +394,7 @@ class LargeNeRFLego(AbstractLegoConfig):
         return NeRF(
             near=2.0,
             far=6.0,
-            n_samples_along_ray=64,
+            n_coarse_samples=64,
             embed_pos=6,
         )
 

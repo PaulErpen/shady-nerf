@@ -12,13 +12,13 @@ class NeRF(nn.Module):
         self,
         near: float,
         far: float,
-        n_samples_along_ray: int,
+        n_coarse_samples: int = 64,
         embed_pos: int = 6,
     ):
         super(NeRF, self).__init__()
         self.near = near
         self.far = far
-        self.n_samples_along_ray = n_samples_along_ray
+        self.n_samples_along_ray = n_coarse_samples
 
         self.fourier_features = FourierFeatures(embed_pos)
 
