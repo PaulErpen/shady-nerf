@@ -2,6 +2,7 @@ from typing import Literal
 from lodnelf.geometry.compute_ray_space_ray_directions import (
     compute_cam_space_ray_directions,
 )
+from lodnelf.util.generate_model_input import generate_model_input
 import numpy as np
 import pygame
 from pygame.locals import *
@@ -94,16 +95,7 @@ class InteractiveDisplay:
 
     def update_image(self, cam2world_matrix):
         H, W = self.config.get_output_image_size()
-        directions = compute_cam_space_ray_directions(
-            H, W, self.focal_length, fraction=float(128 / H)
-        )
-        world_space_ray_directions = directions.view(-1, 3) @ cam2world_matrix[:3, :3].T
-        # repeat the cam2world matrix for each pixel
-        model_input = (
-            cam2world_matrix[:3, 3].expand(world_space_ray_directions.shape[0], 3),
-            world_space_ray_directions,
-            torch.zeros((world_space_ray_directions.shape[0], 3)),
-        )
+        model_input = generate_model_input(H, W, self.focal_length, cam2world_matrix)
         model_output = self.model(model_input)
         model_output = (
             model_output.view(128, 128, 3 if self.mode == "rgb" else 4)
