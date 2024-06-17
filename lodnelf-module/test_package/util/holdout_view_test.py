@@ -1,7 +1,7 @@
 from pathlib import Path
 import unittest
 from lodnelf.train.config.abstract_config import AbstractConfig
-from lodnelf.viz.holdout_view import save_holdout_view
+from lodnelf.viz.holdout_view import HoldoutViewHandler
 from torch import nn
 import torch
 
@@ -16,45 +16,29 @@ class HoldoutViewTest(unittest.TestCase):
             batch_size = ray_origins.shape[0]
             return torch.rand((batch_size, 4))
 
-    class MockedConfig(AbstractConfig):
-        def __init__(self):
-            super(AbstractConfig).__init__()
-
-        def get_name(self):
-            return "mocked_config"
-
-        def get_output_image_size(self):
-            return 800, 800
-
-        def get_camera_focal_length(self):
-            return 1.0
-
-        def get_initial_cam2world_matrix(self):
-            return torch.eye(4)
-
-        def get_model(self):
-            return None
-
-        def get_train_data_set(self, data_directory: str):
-            return None
-
-        def run(
-            self, run_name: str, model_save_path: Path, data_directory: str, device: str
-        ):
-            pass
-
     def test_given_a_mocked_model__when_printing_holdout_view__then_save_the_holdout_view(
         self,
     ):
-        holdout_path = Path("temp_test.png")
+        holdout_path = Path("./holdouts/")
+
+        self.assertFalse(holdout_path.exists())
 
         # given
         model = self.MockedModel()
-        config = self.MockedConfig()
+        holdout_handler = HoldoutViewHandler(
+            H=256,
+            W=256,
+            focal_length=1,
+            cam2world_matrix=torch.eye(4),
+            holdout_path_directory=holdout_path,
+        )
         # when
-        save_holdout_view(model, config, holdout_path)
+        image_name = "temp_test.png"
+        holdout_handler.save_holdout_view(model, image_name)
 
         # then
         self.assertTrue(holdout_path.exists())
+        self.assertTrue((holdout_path / image_name).exists())
 
-        holdout_path.unlink()
+        (holdout_path / image_name).unlink()
+        holdout_path.rmdir()

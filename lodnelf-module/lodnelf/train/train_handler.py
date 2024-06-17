@@ -2,6 +2,7 @@ from typing import Dict
 from lodnelf.metrics.psnr_metric import calculate_psnr
 from lodnelf.train.train_executor import TrainExecutor
 from pathlib import Path
+from lodnelf.viz.holdout_view import HoldoutViewHandler
 import torch
 from lodnelf.train.wandb_logger import WandBLogger
 from lodnelf.train.validation_executor import ValidationExecutor
@@ -18,6 +19,7 @@ class TrainHandler:
         stop_after_no_improvement: int = 3,
         validation_frequency: int = 1,
         model_save_path: Path | None = None,
+        holdout_handler: HoldoutViewHandler | None = None,
     ):
         self.max_epochs = max_epochs
         self.train_executor = train_executor
@@ -27,6 +29,7 @@ class TrainHandler:
         self.model_save_path = model_save_path
         self.train_config = train_config
         self.group_name = group_name
+        self.holdout_handler = holdout_handler
 
     def run(self, run_name: str):
         logger = WandBLogger.from_env(
@@ -48,6 +51,11 @@ class TrainHandler:
                 },
                 step=epoch,
             )
+
+            if self.holdout_handler is not None:
+                self.holdout_handler.save_holdout_view(
+                    self.train_executor.model, f"{run_name}_epoch_{epoch}_holdout.png"
+                )
 
             if epoch % self.validation_frequency == 0:
                 val_loss = self.validation_executor.validate()

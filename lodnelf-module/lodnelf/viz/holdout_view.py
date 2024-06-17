@@ -7,34 +7,48 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def save_holdout_view(model: nn.Module, config: AbstractConfig, holdout_path: Path):
-    # create a holdout view
-    with torch.no_grad():
-        model.eval()
+class HoldoutViewHandler:
+    def __init__(
+        self,
+        H: int,
+        W: int,
+        focal_length: float,
+        cam2world_matrix: torch.Tensor,
+        holdout_path_directory: Path,
+    ):
+        self.H = H
+        self.W = W
+        self.focal_length = focal_length
+        self.cam2world_matrix = cam2world_matrix
+        self.holdout_path_directory = holdout_path_directory
 
-        H, W = config.get_output_image_size()
-        focal_length = config.get_camera_focal_length()
-        cam2world = config.get_initial_cam2world_matrix()
+        if not self.holdout_path_directory.exists():
+            self.holdout_path_directory.mkdir(parents=True)
 
-        model_input = generate_model_input(
-            H,
-            W,
-            focal_length,
-            cam2world_matrix=cam2world,
-            output_size=128,
-        )
+    def save_holdout_view(self, model: nn.Module, filename: str):
+        # create a holdout view
+        with torch.no_grad():
+            model.eval()
 
-        # batch model input into smaller chunks
-        model_input = [x.chunk(1000, dim=0) for x in model_input]
+            model_input = generate_model_input(
+                self.H,
+                self.W,
+                self.focal_length,
+                cam2world_matrix=self.cam2world_matrix,
+                output_size=128,
+            )
 
-        model_output = []
+            # batch model input into smaller chunks
+            model_input = [x.chunk(1000, dim=0) for x in model_input]
 
-        for model_input_chunk in zip(*model_input):
-            model_output.extend(model(model_input_chunk))
+            model_output = []
 
-        rgba = torch.stack(model_output)
-        rgba = rgba.numpy()
-        rgba = np.clip(rgba, 0, 1)
-        plt.imshow(rgba.reshape(128, 128, 4))
+            for model_input_chunk in zip(*model_input):
+                model_output.extend(model(model_input_chunk))
 
-        plt.savefig(holdout_path)
+            rgba = torch.stack(model_output)
+            rgba = rgba.numpy()
+            rgba = np.clip(rgba, 0, 1)
+            plt.imshow(rgba.reshape(128, 128, 4))
+
+            plt.savefig(self.holdout_path_directory / Path(filename))
