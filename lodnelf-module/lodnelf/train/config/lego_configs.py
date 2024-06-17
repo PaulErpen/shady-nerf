@@ -432,7 +432,7 @@ class PointBasedLegoNelf(AbstractLegoConfig):
             "embedding size": "64",
             "dataset": "lego in 400x400",
             "subsample": "0.5",
-            "initial_points": "./data/lego/lego_256.pkl",
+            "initial_points": "./data/lego-points/lego_256.pkl",
         }
         super().__init__(config)
 
