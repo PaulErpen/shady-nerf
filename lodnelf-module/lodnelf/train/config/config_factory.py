@@ -10,6 +10,7 @@ from lodnelf.train.config.lego_configs import (
     LargeDeepPluckerLego,
     LargeNeRFLego,
     FullSkipFourierLegoThreeConfig,
+    PointBasedLegoNelf,
 )
 from lodnelf.train.config.abstract_config import AbstractConfig
 
@@ -44,6 +45,9 @@ class ConfigFactory:
 
         lego_full_skip_fourier = FullSkipFourierLegoThreeConfig()
         self.configs[lego_full_skip_fourier.get_name()] = lego_full_skip_fourier
+
+        lego_point_based = PointBasedLegoNelf()
+        self.configs[lego_point_based.get_name()] = lego_point_based
 
     def get_by_name(self, name: str) -> AbstractConfig:
         if name not in self.configs:

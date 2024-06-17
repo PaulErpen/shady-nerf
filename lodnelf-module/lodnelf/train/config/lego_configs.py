@@ -2,6 +2,7 @@ from typing import Callable, Dict, Tuple
 from lodnelf.data.lego_dataset import LegoDataset
 from lodnelf.model.full_fourier import FullFourier
 from lodnelf.model.my_nerf import NeRF
+from lodnelf.model.point_based_nelf import PointBasedNelf
 from lodnelf.model.sh_plucker import ShPlucker
 from lodnelf.train.config.abstract_config import AbstractConfig
 from lodnelf.model.deep_neural_network_plucker import DeepNeuralNetworkPlucker
@@ -11,8 +12,10 @@ from lodnelf.train.loss import LFLoss
 from lodnelf.train.train_executor import TrainExecutor
 from lodnelf.train.train_handler import TrainHandler
 from lodnelf.train.validation_executor import ValidationExecutor
+from lodnelf.viz.holdout_view import HoldoutViewHandler
 import torch.utils.data
 from pathlib import Path
+import pickle
 
 
 class AbstractLegoConfig(AbstractConfig):
@@ -88,6 +91,16 @@ class AbstractLegoConfig(AbstractConfig):
     def get_subset_size(self) -> float | None:
         return None
 
+    def get_holdout_handler(self, holdout_path: Path):
+        H, W = self.get_output_image_size()
+        return HoldoutViewHandler(
+            H=H,
+            W=W,
+            focal_length=self.get_camera_focal_length(),
+            cam2world_matrix=self.get_initial_cam2world_matrix(),
+            holdout_path_directory=holdout_path,
+        )
+
     def run(
         self, run_name: str, model_save_path: Path, data_directory: str, device: str
     ):
@@ -125,6 +138,7 @@ class AbstractLegoConfig(AbstractConfig):
             model_save_path=model_save_path,
             train_config=self.config,
             group_name="experiment",
+            holdout_handler=self.get_holdout_handler(model_save_path / "holdouts"),
         )
         train_handler.run(run_name)
 
@@ -134,7 +148,7 @@ class DeepPluckerLegoThreeConfig(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "DeepPlucker with hidden_dims=[256] * 3",
             "dataset": "lego rescaled to 128x128",
@@ -159,7 +173,7 @@ class DeepPluckerLegoSixConfig(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "DeepPlucker with hidden_dims=[256] * 6",
             "dataset": "lego rescaled to 128x128",
@@ -182,7 +196,7 @@ class PlanarFourierLegoThreeConfig(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "PlanarFourier with hidden_dims=[256] * 3, mapping size 6",
             "dataset": "lego rescaled to 128x128",
@@ -207,7 +221,7 @@ class PlanarFourierLegoThreeToThreeConfig(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "PlanarFourierSkip with hd_before_skip=[256] * 3, hd_after_skip=[256] * 3",
             "dataset": "lego rescaled to 128x128",
@@ -232,7 +246,7 @@ class FullFourierLegoThreeConfig(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "PlanarFourierSkip with hidden_dims=[256] * 3, fourier_mapping_size=6",
             "dataset": "lego rescaled to 128x128",
@@ -279,7 +293,7 @@ class FullSkipFourierLegoThreeConfig(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "PlanarFourierSkip with hidden_dims=[256] * 5, fourier_mapping_size=6",
             "dataset": "lego rescaled to 128x128",
@@ -327,7 +341,7 @@ class LegoShPlucker(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "ShPlucker with hidden_dims=[256] * 3",
             "dataset": "lego rescaled to 128x128",
@@ -346,11 +360,11 @@ class LargeDeepPluckerLego(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "DeepNeuralNetworkPlucker with hidden_dims=[256] * 3",
-            "dataset": "lego in 800x800",
-            "subsample": "0.01",
+            "dataset": "lego in 400x400",
+            "subsample": "0.5",
         }
         super().__init__(config)
 
@@ -365,10 +379,10 @@ class LargeDeepPluckerLego(AbstractLegoConfig):
         )
 
     def get_output_image_size(self) -> Tuple[int, int]:
-        return 800, 800
+        return 400, 400
 
     def get_subset_size(self) -> float | None:
-        return 0.01
+        return 0.5
 
 
 class LargeNeRFLego(AbstractLegoConfig):
@@ -376,7 +390,7 @@ class LargeNeRFLego(AbstractLegoConfig):
         config: Dict[str, str] = {
             "optimizer": "AdamW (lr 1e-4)",
             "loss": "LFLoss",
-            "batch_size": str(1),
+            "batch_size": str(64),
             "max_epochs": str(150),
             "model_description": "NeRF with hidden dims [256, 256, 256, 256]",
             "dataset": "lego in 800x800",
@@ -404,3 +418,37 @@ class LargeNeRFLego(AbstractLegoConfig):
 
     def get_subset_size(self) -> float | None:
         return 0.01
+
+
+class PointBasedLegoNelf(AbstractLegoConfig):
+    def __init__(self):
+        config: Dict[str, str] = {
+            "optimizer": "AdamW (lr 1e-4)",
+            "loss": "LFLoss",
+            "batch_size": str(64),
+            "max_epochs": str(150),
+            "model_description": "PointBasedNelf",
+            "hidden dims": "[64, 64]",
+            "embedding size": "64",
+            "dataset": "lego in 400x400",
+            "subsample": "0.5",
+            "initial_points": "./data/lego/lego_256.pkl",
+        }
+        super().__init__(config)
+
+    def get_name(self) -> str:
+        return "PointBasedLegoNelf"
+
+    def get_model(self):
+        initial_points = pickle.load(open(self.config["initial_points"], "rb"))
+        return PointBasedNelf(
+            initial_point=initial_points,
+            hidden_dims=[64, 64],
+            point_embedding_size=64,
+        )
+
+    def get_output_image_size(self) -> Tuple[int, int]:
+        return 400, 400
+
+    def get_subset_size(self) -> float | None:
+        return 0.5
